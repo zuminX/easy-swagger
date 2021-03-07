@@ -2,11 +2,11 @@ package com.zuminX.utils;
 
 import com.intellij.psi.PsiType;
 import com.zuminX.enums.BaseType;
-import com.zuminX.names.ControllerClassName;
-import java.util.List;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.StringUtils;
 
-public class CommentUtils {
+@UtilityClass
+public class CoreUtils {
 
   public static String getDataType(String dataType, PsiType psiType) {
     String typeName = BaseType.findByName(dataType);
@@ -31,7 +31,6 @@ public class CommentUtils {
     }
     return null;
   }
-
 
   /**
    * 获取注解说明  不写/@desc/@describe/@description
@@ -83,13 +82,4 @@ public class CommentUtils {
     String desc = string.substring(descIndex);
     stringBuilder.append(desc);
   }
-
-  public static void main(String[] args) {
-    List<ControllerClassName> all = ControllerClassName.getAll();
-    for (ControllerClassName controllerClassName : all) {
-      System.out.println(controllerClassName);
-    }
-  }
-
-
 }

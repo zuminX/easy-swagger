@@ -1,5 +1,6 @@
 package com.zuminX;
 
+import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -8,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
 import com.zuminX.utils.GeneratorUtils;
-import org.apache.commons.lang.StringUtils;
 
 public class SwaggerTool extends AnAction {
 
@@ -24,10 +24,10 @@ public class SwaggerTool extends AnAction {
 
     String selectionText = editor.getSelectionModel().getSelectedText();
     GeneratorUtils generatorUtils = new GeneratorUtils(project, psiFile);
-    if (StringUtils.isNotEmpty(selectionText)) {
-      generatorUtils.generateSelection(selectionText);
+    if (StrUtil.isBlank(selectionText)) {
+      generatorUtils.generate();
     } else {
-      generatorUtils.generateDefault();
+      generatorUtils.generate(selectionText);
     }
   }
 
