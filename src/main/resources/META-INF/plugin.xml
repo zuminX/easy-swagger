@@ -1,0 +1,21 @@
+<idea-plugin>
+    <id>com.github.zuminX.easy-swagger</id>
+    <name>zuminX</name>
+    <vendor email="1215287120@qq.com" url="http://www.github.com/zuminX">GitHub</vendor>
+
+    <description>TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST</description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <action id="com.zuminX.SwaggerTool" class="com.zuminX.SwaggerTool" text="SwaggerAnnotation"
+          description="Generate swagger annotation">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>
