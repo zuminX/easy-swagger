@@ -23,20 +23,27 @@ import com.intellij.psi.PsiType;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.ui.render.LabelBasedRenderer;
+import com.jgoodies.common.base.Objects;
 import com.zuminX.names.ControllerAnnotation;
 import com.zuminX.names.MappingAnnotation;
 import com.zuminX.names.RequestAnnotation;
-import com.zuminX.names.swagger.SwaggerAnnotation;
+import com.zuminX.names.SwaggerAnnotation;
+import com.zuminX.swagger.ApiAnnotation;
+import com.zuminX.swagger.ApiImplicitParamAnnotation;
+import com.zuminX.swagger.ApiImplicitParamsAnnotation;
+import com.zuminX.swagger.ApiModelAnnotation;
+import com.zuminX.swagger.ApiModelPropertyAnnotation;
+import com.zuminX.swagger.ApiOperationAnnotation;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 
 public class GeneratorUtils {
 
-  public static final String DOUBLE_QUOTES = "\"\"";
   private static final String MAPPING_VALUE = "value";
   private static final String MAPPING_METHOD = "method";
   private final Project project;
@@ -130,7 +137,7 @@ public class GeneratorUtils {
   private PsiMethod findMethodByName(PsiClass psiClass, String name) {
     PsiMethod[] methods = psiClass.getMethods();
     return Arrays.stream(methods)
-        .filter(psiMethod -> Objects.equals(name, psiMethod.getName()))
+        .filter(psiMethod -> com.jgoodies.common.base.Objects.equals(name, psiMethod.getName()))
         .findFirst()
         .orElse(null);
   }
@@ -145,7 +152,7 @@ public class GeneratorUtils {
   private PsiField findFieldByNameIdentifier(PsiClass psiClass, String nameIdentifier) {
     PsiField[] fields = psiClass.getAllFields();
     return Arrays.stream(fields)
-        .filter(psiField -> Objects.equals(nameIdentifier, psiField.getNameIdentifier().getText()))
+        .filter(psiField -> com.jgoodies.common.base.Objects.equals(nameIdentifier, psiField.getNameIdentifier().getText()))
         .findFirst()
         .orElse(null);
   }
@@ -214,18 +221,16 @@ public class GeneratorUtils {
     List<PsiComment> commentList = getCommentByClass(psiClass);
     if (commentList.isEmpty()) {
       String annotationFromText;
-      SwaggerAnnotation className;
+      SwaggerAnnotation annotation;
       if (isController) {
-        className = SwaggerAnnotation.API;
+        annotation = ApiAnnotation.API;
         String fieldValue = getMappingAttribute(psiClass.getModifierList().getAnnotations(), MAPPING_VALUE);
-        String template = "@{}(value = {})";
-        annotationFromText = StrUtil.format(template, className.getSimpleName(), fieldValue);
+        annotationFromText = ApiAnnotation.builder().value(fieldValue).build().toStr();
       } else {
-        className = SwaggerAnnotation.API_MODEL;
-        String template = "@{}";
-        annotationFromText = StrUtil.format(template, className.getSimpleName());
+        annotation = ApiModelAnnotation.API_MODEL;
+        annotationFromText = ApiModelAnnotation.builder().build().toStr();
       }
-      this.doWrite(className, annotationFromText, psiClass);
+      this.doWrite(annotation, annotationFromText, psiClass);
       return;
     }
     for (PsiComment comment : commentList) {
@@ -234,14 +239,12 @@ public class GeneratorUtils {
       String annotationFromText;
       SwaggerAnnotation className;
       if (isController) {
-        className = SwaggerAnnotation.API;
+        className = ApiAnnotation.API;
         String fieldValue = getMappingAttribute(psiClass.getModifierList().getAnnotations(), MAPPING_VALUE);
-        String template = "@{}(value = {}, tags = {\"{}\"})";
-        annotationFromText = StrUtil.format(template, className.getSimpleName(), fieldValue, commentDesc);
+        annotationFromText = ApiAnnotation.builder().value(fieldValue).tags(Collections.singletonList(commentDesc)).build().toStr();
       } else {
-        className = SwaggerAnnotation.API_MODEL;
-        String template = "@{}(description = {\"{}\"})";
-        annotationFromText = StrUtil.format(template, className.getSimpleName(), commentDesc);
+        className = ApiModelAnnotation.API_MODEL;
+        annotationFromText = ApiModelAnnotation.builder().description(commentDesc).build().toStr();
       }
       this.doWrite(className, annotationFromText, psiClass);
     }
@@ -258,13 +261,12 @@ public class GeneratorUtils {
     if (StringUtils.isNotEmpty(methodValue)) {
       methodValue = methodValue.substring(methodValue.indexOf(".") + 1);
     }
-    SwaggerAnnotation operation = SwaggerAnnotation.API_OPERATION;
     // 如果存在注解，获取注解原本的value和notes内容
-    PsiAnnotation apiOperationExist = psiMethod.getModifierList().findAnnotation(operation.getQualifiedName());
-    String apiOperationAttrValue = this.getAttribute(apiOperationExist, "value");
-    String apiOperationAttrNotes = this.getAttribute(apiOperationExist, "notes");
-    String operationTemplate = "@ApiOperation(value = {}, notes = {}, httpMethod = \"{}\")";
-    String apiOperationAnnotationText = StrUtil.format(operationTemplate, apiOperationAttrValue, apiOperationAttrNotes, methodValue);
+    PsiAnnotation apiOperationExist = psiMethod.getModifierList().findAnnotation(ApiOperationAnnotation.API_OPERATION.getQualifiedName());
+    String apiOperationAnnotationText = ApiOperationAnnotation.builder()
+        .value(getAttribute(apiOperationExist, "value"))
+        .notes(getAttribute(apiOperationExist, "notes"))
+        .httpMethod(methodValue).build().toStr();
     String apiImplicitParamsAnnotationText = null;
     PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
     List<String> apiImplicitParamList = new ArrayList<>(psiParameters.length);
@@ -289,19 +291,23 @@ public class GeneratorUtils {
           paramType = className.getType();
         }
       }
-      String paramTemplate = "@ApiImplicitParam(paramType = \"{}\", dataType = \"{}\", name = \"{}\", value = \"\")";
-      String apiImplicitParamText = StrUtil.format(paramTemplate, paramType, dataType, psiParameter.getNameIdentifier().getText());
-      apiImplicitParamList.add(apiImplicitParamText);
+      apiImplicitParamList.add(ApiImplicitParamAnnotation.builder()
+          .paramType(paramType)
+          .dataType(dataType)
+          .name(psiParameter.getNameIdentifier().getText())
+          .value("")
+          .build()
+          .toStr());
     }
-    if (apiImplicitParamList.size() != 0) {
+    if (!apiImplicitParamList.isEmpty()) {
       apiImplicitParamsAnnotationText = apiImplicitParamList.stream().collect(Collectors.joining(",\n", "@ApiImplicitParams({\n", "\n})"));
     }
 
-    this.doWrite(operation, apiOperationAnnotationText, psiMethod);
+    this.doWrite(ApiOperationAnnotation.API_OPERATION, apiOperationAnnotationText, psiMethod);
     if (StrUtil.isNotEmpty(apiImplicitParamsAnnotationText)) {
-      this.doWrite(SwaggerAnnotation.API_IMPLICIT_PARAMS, apiImplicitParamsAnnotationText, psiMethod);
+      this.doWrite(ApiImplicitParamsAnnotation.API_IMPLICIT_PARAMS, apiImplicitParamsAnnotationText, psiMethod);
     }
-    addImport(elementFactory, psiFile, SwaggerAnnotation.API_IMPLICIT_PARAM.getSimpleName());
+    addImport(elementFactory, psiFile, ApiImplicitParamAnnotation.API_IMPLICIT_PARAM.getSimpleName());
   }
 
   /**
@@ -311,17 +317,16 @@ public class GeneratorUtils {
    */
   private void generateFieldAnnotation(PsiField psiField) {
     List<PsiComment> commentList = getCommentByField(psiField);
-    SwaggerAnnotation modelProperty = SwaggerAnnotation.API_MODEL_PROPERTY;
+    SwaggerAnnotation annotation = ApiModelPropertyAnnotation.API_MODEL_PROPERTY;
     if (commentList.isEmpty()) {
-      this.doWrite(modelProperty, "@ApiModelProperty(\"\")", psiField);
+      this.doWrite(annotation, ApiModelPropertyAnnotation.builder().value("").build().toStr(), psiField);
       return;
     }
-    String template = "@ApiModelProperty(value=\"{}\")";
     commentList.stream()
         .map(PsiElement::getText)
         .map(CoreUtils::getCommentDesc)
-        .map(commentDesc -> StrUtil.format(template, commentDesc))
-        .forEach(apiModelPropertyText -> this.doWrite(modelProperty, apiModelPropertyText, psiField));
+        .map(commentDesc -> ApiModelPropertyAnnotation.builder().value(commentDesc).build().toStr())
+        .forEach(apiModelPropertyText -> this.doWrite(annotation, apiModelPropertyText, psiField));
   }
 
   /**
@@ -366,10 +371,10 @@ public class GeneratorUtils {
    */
   private String getAttribute(PsiAnnotation psiAnnotation, String attributeName) {
     if (psiAnnotation == null) {
-      return DOUBLE_QUOTES;
+      return "";
     }
     PsiAnnotationMemberValue psiAnnotationMemberValue = psiAnnotation.findDeclaredAttributeValue(attributeName);
-    return psiAnnotationMemberValue == null ? DOUBLE_QUOTES : psiAnnotationMemberValue.getText();
+    return psiAnnotationMemberValue == null ? "" : psiAnnotationMemberValue.getText();
   }
 
   /**
@@ -383,8 +388,7 @@ public class GeneratorUtils {
     for (PsiAnnotation psiAnnotation : psiAnnotations) {
       String qualifiedName = psiAnnotation.getQualifiedName();
       if (MappingAnnotation.REQUEST_MAPPING.equals(qualifiedName)) {
-        String attribute = getAttribute(psiAnnotation, attributeName);
-        return DOUBLE_QUOTES.equals(attribute) ? "" : attribute;
+        return getAttribute(psiAnnotation, attributeName);
       }
       MappingAnnotation mapping = MappingAnnotation.findByQualifiedName(qualifiedName);
       if (mapping != null) {

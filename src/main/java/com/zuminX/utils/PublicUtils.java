@@ -1,5 +1,7 @@
 package com.zuminX.utils;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -43,5 +45,15 @@ public class PublicUtils {
     return Arrays.stream(fields)
         .filter(predicate)
         .collect(Collectors.toList());
+  }
+
+  public static String wrapInDoubleQuotes(Object value) {
+    String str = Convert.toStr(value, "");
+    return str.isEmpty() ? "\"\"" : "\"" + str + "\"";
+  }
+
+  public static String wrapInCurlyBraces(Object value) {
+    String str = Convert.toStr(value, "");
+    return str.isEmpty() ? "{}" : "{" + str + "}";
   }
 }

@@ -3,10 +3,9 @@ package com.zuminX.utils;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
@@ -15,33 +14,31 @@ import org.jetbrains.annotations.NotNull;
 /**
  * 注解字符串
  */
-@Getter
-@SuperBuilder
-public class AnnotationStr {
+public abstract class AnnotationStr {
 
-  private final String qualifiedName;
-
-  private final String value;
+  /**
+   * 获取该注解的简单类名
+   * @return 简单类名
+   */
+  protected abstract String getSimpleName();
 
   /**
    * 获取无内容的注解字符串
    *
-   * @param qualifiedName 全限定类名
    * @return 注解字符串
    */
-  public static String empty(String qualifiedName) {
-    return "@" + qualifiedName;
+  public String empty() {
+    return "@" + getSimpleName();
   }
 
   /**
    * 获取注解字符串
    *
-   * @param clazz 父类或超类是注解字符串类的Class对象
    * @param <T>   父类或超类是注解字符串类的类
    * @return 注解字符串
    */
-  protected <T extends AnnotationStr> String toString(@NotNull Class<T> clazz) {
-    return toString(clazz, this);
+  public <T extends AnnotationStr> String toStr() {
+    return toStr(this.getClass(), this);
   }
 
   /**
@@ -53,16 +50,13 @@ public class AnnotationStr {
    */
   @SneakyThrows
   @SuppressWarnings("unchecked")
-  private static <T extends AnnotationStr> String toString(Class<T> clazz, AnnotationStr annotationStr) {
+  private <T extends AnnotationStr> String toStr(Class<T> clazz, AnnotationStr annotationStr) {
     List<Field> fields = PublicUtils.getNotStaticField(clazz);
     if (fields.isEmpty()) {
-      return empty(annotationStr.qualifiedName);
+      return annotationStr.empty();
     }
-    StringBuilder sb = new StringBuilder(empty(annotationStr.qualifiedName));
+    StringBuilder sb = new StringBuilder(annotationStr.empty());
     sb.append("(");
-    if (annotationStr.value != null) {
-      sb.append("value = \"").append(annotationStr.value).append("\", ");
-    }
     for (Field field : fields) {
       field.setAccessible(true);
       Object value = field.get(annotationStr);
@@ -77,20 +71,22 @@ public class AnnotationStr {
         Class<?> valueClass = (Class<?>) TypeUtil.getTypeArgument(field.getGenericType());
         if (AnnotationStr.class.isAssignableFrom(valueClass)) {
           String childContent = ((List<AnnotationStr>) value).stream()
-              .map(annotation -> toString((Class<? extends AnnotationStr>) valueClass, annotation))
+              .map(annotation -> toStr((Class<? extends AnnotationStr>) valueClass, annotation))
               .collect(Collectors.joining(",\n"));
-          sb.append('{').append(childContent).append('}');
+          sb.append(PublicUtils.wrapInCurlyBraces(childContent));
           continue;
         }
         String objectsStr = ((List<Object>) value).stream()
-            .map(object -> PublicUtils.isNumOrBool(object) ? object.toString() : "\"" + object.toString() + "\"")
+            .map(object -> PublicUtils.isNumOrBool(object) ? object.toString() : PublicUtils.wrapInDoubleQuotes(object))
             .collect(Collectors.joining(", "));
-        content = "{" + objectsStr + "}";
+        content = PublicUtils.wrapInCurlyBraces(objectsStr);
       } else {
-        content = "\"" + value.toString() + "\"";
+        content = PublicUtils.wrapInDoubleQuotes(value);
       }
       sb.append(name).append(" = ").append(content).append(", ");
     }
     return StrUtil.removeSuffix(sb, ", ") + ")";
   }
+
+
 }
