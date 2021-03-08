@@ -4,14 +4,10 @@ import com.zuminX.names.SwaggerAnnotation;
 import com.zuminX.utils.AnnotationStr;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Builder
 public class ApiImplicitParamAnnotation extends AnnotationStr {
-
-  public static final SwaggerAnnotation API_IMPLICIT_PARAM = new SwaggerAnnotation("io.swagger.annotations.ApiImplicitParam",
-      "ApiImplicitParam");
 
   private final String name;
 
@@ -47,6 +43,6 @@ public class ApiImplicitParamAnnotation extends AnnotationStr {
 
   @Override
   protected String getSimpleName() {
-    return API_IMPLICIT_PARAM.getSimpleName();
+    return SwaggerAnnotation.API_IMPLICIT_PARAM.getSimpleName();
   }
 }

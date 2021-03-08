@@ -5,11 +5,7 @@ import cn.hutool.core.util.TypeUtil;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.experimental.SuperBuilder;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * 注解字符串
@@ -18,6 +14,7 @@ public abstract class AnnotationStr {
 
   /**
    * 获取该注解的简单类名
+   *
    * @return 简单类名
    */
   protected abstract String getSimpleName();
@@ -34,7 +31,7 @@ public abstract class AnnotationStr {
   /**
    * 获取注解字符串
    *
-   * @param <T>   父类或超类是注解字符串类的类
+   * @param <T> 父类或超类是注解字符串类的类
    * @return 注解字符串
    */
   public <T extends AnnotationStr> String toStr() {
@@ -72,7 +69,7 @@ public abstract class AnnotationStr {
         if (AnnotationStr.class.isAssignableFrom(valueClass)) {
           String childContent = ((List<AnnotationStr>) value).stream()
               .map(annotation -> toStr((Class<? extends AnnotationStr>) valueClass, annotation))
-              .collect(Collectors.joining(",\n"));
+              .collect(Collectors.joining(",\n", "\n", ""));
           sb.append(PublicUtils.wrapInCurlyBraces(childContent));
           continue;
         }

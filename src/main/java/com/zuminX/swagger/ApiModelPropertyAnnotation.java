@@ -4,14 +4,10 @@ import com.zuminX.names.SwaggerAnnotation;
 import com.zuminX.utils.AnnotationStr;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Builder
 public class ApiModelPropertyAnnotation extends AnnotationStr {
-
-  public static final SwaggerAnnotation API_MODEL_PROPERTY = new SwaggerAnnotation("io.swagger.annotations.ApiModelProperty",
-      "ApiModelProperty");
 
   private final String value;
 
@@ -39,6 +35,6 @@ public class ApiModelPropertyAnnotation extends AnnotationStr {
 
   @Override
   protected String getSimpleName() {
-    return API_MODEL_PROPERTY.getSimpleName();
+    return SwaggerAnnotation.API_MODEL_PROPERTY.getSimpleName();
   }
 }

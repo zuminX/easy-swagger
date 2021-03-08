@@ -31,6 +31,4 @@ public class MappingAnnotation extends ClassName {
   public static MappingAnnotation findByQualifiedName(String qualifiedName) {
     return ClassName.findByQualifiedName(MappingAnnotation.class, qualifiedName);
   }
-
-
 }

@@ -14,9 +14,14 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 @AllArgsConstructor
-public abstract class ClassName {
+public class ClassName {
 
   private final String qualifiedName;
+
+  public String getSimpleName() {
+    int index = qualifiedName.lastIndexOf('.');
+    return index == -1 ? qualifiedName : qualifiedName.substring(index + 1);
+  }
 
   @SneakyThrows
   protected static <T extends ClassName> List<T> getAll(@NotNull Class<T> clazz) {

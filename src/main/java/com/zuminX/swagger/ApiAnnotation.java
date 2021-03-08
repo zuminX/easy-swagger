@@ -5,13 +5,10 @@ import com.zuminX.utils.AnnotationStr;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Builder
 public class ApiAnnotation extends AnnotationStr {
-
-  public static final SwaggerAnnotation API = new SwaggerAnnotation("io.swagger.annotations.Api", "Api");
 
   private final String value;
 
@@ -27,6 +24,6 @@ public class ApiAnnotation extends AnnotationStr {
 
   @Override
   protected String getSimpleName() {
-    return API.getSimpleName();
+    return SwaggerAnnotation.API.getSimpleName();
   }
 }
