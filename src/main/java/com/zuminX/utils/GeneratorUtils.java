@@ -39,7 +39,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
 
 public class GeneratorUtils {
 
@@ -77,10 +76,11 @@ public class GeneratorUtils {
    * 根据当前类生成Swagger注解
    */
   private void generateDefault() {
-    generateClassAnnotation(psiClass);
     if (isController(psiClass)) {
+      generateControllerClassAnnotation(psiClass);
       Arrays.stream(psiClass.getMethods()).forEach(this::generateMethodAnnotation);
     } else {
+      generateDomainClassAnnotation(psiClass);
       Arrays.stream(psiClass.getAllFields()).forEach(this::generateFieldAnnotation);
     }
   }
@@ -91,6 +91,7 @@ public class GeneratorUtils {
   public void generateSelection(String selectionText) {
     if (ObjectUtil.equals(selectionText, psiClass.getName())) {
       this.generateClassAnnotation(psiClass);
+      return;
     }
     PsiMethod method = findMethodByName(psiClass, selectionText);
     if (method != null) {
@@ -159,14 +160,14 @@ public class GeneratorUtils {
   /**
    * 写入Swagger注解到文件
    *
-   * @param className            注解类名
-   * @param annotationText       生成注解文本
+   * @param annotationStr        注解字符串对象
    * @param psiModifierListOwner 当前写入对象
    */
-  private void doWrite(ClassName className, String annotationText, PsiModifierListOwner psiModifierListOwner) {
+  private void doWrite(AnnotationStr annotationStr, PsiModifierListOwner psiModifierListOwner) {
+    ClassName className = annotationStr.getClassName();
     removeAnnotation(className.getQualifiedName(), psiModifierListOwner);
     addImport(elementFactory, psiFile, className);
-    addAnnotation(className.getSimpleName(), annotationText, psiModifierListOwner);
+    addAnnotation(className.getSimpleName(), annotationStr.toStr(), psiModifierListOwner);
   }
 
   /**
@@ -216,36 +217,46 @@ public class GeneratorUtils {
    * @param psiClass Psi类
    */
   private void generateClassAnnotation(PsiClass psiClass) {
-    boolean isController = isController(psiClass);
+    if (isController(psiClass)) {
+      generateControllerClassAnnotation(psiClass);
+    } else {
+      generateDomainClassAnnotation(psiClass);
+    }
+  }
+
+  /**
+   * 生成控制类注解
+   *
+   * @param psiClass Psi类
+   */
+  private void generateControllerClassAnnotation(PsiClass psiClass) {
     List<PsiComment> commentList = getCommentByClass(psiClass);
     if (commentList.isEmpty()) {
-      String annotationFromText;
-      ClassName annotation;
-      if (isController) {
-        annotation = SwaggerAnnotation.API;
-        String fieldValue = getMappingAttribute(psiClass.getModifierList().getAnnotations(), MAPPING_VALUE);
-        annotationFromText = ApiAnnotation.builder().value(fieldValue).build().toStr();
-      } else {
-        annotation = SwaggerAnnotation.API_MODEL;
-        annotationFromText = ApiModelAnnotation.builder().build().toStr();
-      }
-      this.doWrite(annotation, annotationFromText, psiClass);
+      String fieldValue = getMappingAttribute(psiClass.getModifierList().getAnnotations(), MAPPING_VALUE);
+      doWrite(ApiAnnotation.builder().value(fieldValue).build(), psiClass);
+      return;
+    }
+    commentList.stream().map(comment -> CoreUtils.getCommentDesc(comment.getText())).forEach(commentDesc -> {
+      String fieldValue = getMappingAttribute(psiClass.getModifierList().getAnnotations(), MAPPING_VALUE);
+      AnnotationStr annotationStr = ApiAnnotation.builder().value(fieldValue).tags(Collections.singletonList(commentDesc)).build();
+      doWrite(annotationStr, psiClass);
+    });
+  }
+
+  /**
+   * 生成实体类注解
+   *
+   * @param psiClass Psi类
+   */
+  private void generateDomainClassAnnotation(PsiClass psiClass) {
+    List<PsiComment> commentList = getCommentByClass(psiClass);
+    if (commentList.isEmpty()) {
+      doWrite(ApiModelAnnotation.builder().build(), psiClass);
       return;
     }
     for (PsiComment comment : commentList) {
-      String tmpText = comment.getText();
-      String commentDesc = CoreUtils.getCommentDesc(tmpText);
-      String annotationFromText;
-      ClassName className;
-      if (isController) {
-        className = SwaggerAnnotation.API;
-        String fieldValue = getMappingAttribute(psiClass.getModifierList().getAnnotations(), MAPPING_VALUE);
-        annotationFromText = ApiAnnotation.builder().value(fieldValue).tags(Collections.singletonList(commentDesc)).build().toStr();
-      } else {
-        className = SwaggerAnnotation.API_MODEL;
-        annotationFromText = ApiModelAnnotation.builder().description(commentDesc).build().toStr();
-      }
-      this.doWrite(className, annotationFromText, psiClass);
+      String commentDesc = CoreUtils.getCommentDesc(comment.getText());
+      doWrite(ApiModelAnnotation.builder().description(commentDesc).build(), psiClass);
     }
   }
 
@@ -255,19 +266,37 @@ public class GeneratorUtils {
    * @param psiMethod Psi方法
    */
   private void generateMethodAnnotation(PsiMethod psiMethod) {
+    generateMethodOperationAnnotation(psiMethod);
+    generateMethodParameterAnnotation(psiMethod);
+    addImport(elementFactory, psiFile, SwaggerAnnotation.API_IMPLICIT_PARAM);
+  }
+
+  /**
+   * 生成方法操作注解
+   *
+   * @param psiMethod Psi方法
+   */
+  private void generateMethodOperationAnnotation(PsiMethod psiMethod) {
     PsiAnnotation[] psiAnnotations = psiMethod.getModifierList().getAnnotations();
-    String methodValue = this.getMappingAttribute(psiAnnotations, MAPPING_METHOD);
-    if (StringUtils.isNotEmpty(methodValue)) {
+    String methodValue = getMappingAttribute(psiAnnotations, MAPPING_METHOD);
+    if (StrUtil.isNotEmpty(methodValue)) {
       methodValue = methodValue.substring(methodValue.indexOf(".") + 1);
     }
     //如果存在注解，获取注解原本的value和notes内容
     PsiAnnotation apiOperationExist = psiMethod.getModifierList().findAnnotation(SwaggerAnnotation.API_OPERATION.getQualifiedName());
-    String apiOperationAnnotationText = ApiOperationAnnotation.builder()
+    AnnotationStr annotationStr = ApiOperationAnnotation.builder()
         .value(getAttribute(apiOperationExist, "value"))
         .notes(getAttribute(apiOperationExist, "notes"))
-        .httpMethod(methodValue).build().toStr();
-    this.doWrite(SwaggerAnnotation.API_OPERATION, apiOperationAnnotationText, psiMethod);
+        .httpMethod(methodValue).build();
+    doWrite(annotationStr, psiMethod);
+  }
 
+  /**
+   * 生成方法参数注解
+   *
+   * @param psiMethod Psi方法
+   */
+  private void generateMethodParameterAnnotation(PsiMethod psiMethod) {
     PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
     List<ApiImplicitParamAnnotation> apiImplicitParamList = new ArrayList<>(psiParameters.length);
     for (PsiParameter psiParameter : psiParameters) {
@@ -276,10 +305,7 @@ public class GeneratorUtils {
       if (StrUtil.isEmpty(dataType)) {
         continue;
       }
-      String paramType = "query";
-      if ("file".equals(dataType)) {
-        paramType = "form";
-      }
+      String paramType = "file".equals(dataType) ? "form" : "query";
 
       for (PsiAnnotation psiAnnotation : psiParameter.getModifierList().getAnnotations()) {
         if (StrUtil.isEmpty(psiAnnotation.getQualifiedName())) {
@@ -298,12 +324,10 @@ public class GeneratorUtils {
           .value("")
           .build());
     }
-    if (!apiImplicitParamList.isEmpty()) {
-      String apiImplicitParamsAnnotationText = ApiImplicitParamsAnnotation.builder().value(apiImplicitParamList).build().toStr();
-      doWrite(SwaggerAnnotation.API_IMPLICIT_PARAMS, apiImplicitParamsAnnotationText, psiMethod);
+    if (apiImplicitParamList.isEmpty()) {
+      return;
     }
-
-    addImport(elementFactory, psiFile, SwaggerAnnotation.API_IMPLICIT_PARAM);
+    doWrite(ApiImplicitParamsAnnotation.builder().value(apiImplicitParamList).build(), psiMethod);
   }
 
   /**
@@ -313,16 +337,15 @@ public class GeneratorUtils {
    */
   private void generateFieldAnnotation(PsiField psiField) {
     List<PsiComment> commentList = getCommentByField(psiField);
-    ClassName annotation = SwaggerAnnotation.API_MODEL_PROPERTY;
     if (commentList.isEmpty()) {
-      this.doWrite(annotation, ApiModelPropertyAnnotation.builder().value("").build().toStr(), psiField);
+      doWrite(ApiModelPropertyAnnotation.builder().value("").build(), psiField);
       return;
     }
     commentList.stream()
         .map(PsiElement::getText)
         .map(CoreUtils::getCommentDesc)
-        .map(commentDesc -> ApiModelPropertyAnnotation.builder().value(commentDesc).build().toStr())
-        .forEach(apiModelPropertyText -> this.doWrite(annotation, apiModelPropertyText, psiField));
+        .map(commentDesc -> ApiModelPropertyAnnotation.builder().value(commentDesc).build())
+        .forEach(annotationStr -> doWrite(annotationStr, psiField));
   }
 
   /**
@@ -359,6 +382,33 @@ public class GeneratorUtils {
   }
 
   /**
+   * 获取RequestMapping注解属性
+   *
+   * @param psiAnnotations 注解元素数组
+   * @param attributeName  属性名
+   * @return 属性值
+   */
+  private String getMappingAttribute(PsiAnnotation[] psiAnnotations, String attributeName) {
+    PsiAnnotation psiAnnotation = null;
+    MappingAnnotation mappingAnnotation = null;
+    for (PsiAnnotation annotation : psiAnnotations) {
+      MappingAnnotation mapping = MappingAnnotation.findByQualifiedName(annotation.getQualifiedName());
+      if (mapping != null) {
+        mappingAnnotation = mapping;
+        psiAnnotation = annotation;
+        break;
+      }
+    }
+    if (mappingAnnotation == null) {
+      return "";
+    }
+    if (MappingAnnotation.REQUEST_MAPPING.equals(mappingAnnotation)) {
+      return getAttribute(psiAnnotation, attributeName);
+    }
+    return mappingAnnotation.getType();
+  }
+
+  /**
    * 获取注解属性
    *
    * @param psiAnnotation 注解全路径
@@ -374,27 +424,6 @@ public class GeneratorUtils {
   }
 
   /**
-   * 获取RequestMapping注解属性
-   *
-   * @param psiAnnotations 注解元素数组
-   * @param attributeName  属性名
-   * @return 属性值
-   */
-  private String getMappingAttribute(PsiAnnotation[] psiAnnotations, String attributeName) {
-    for (PsiAnnotation psiAnnotation : psiAnnotations) {
-      String qualifiedName = psiAnnotation.getQualifiedName();
-      if (MappingAnnotation.REQUEST_MAPPING.equals(qualifiedName)) {
-        return getAttribute(psiAnnotation, attributeName);
-      }
-      MappingAnnotation mapping = MappingAnnotation.findByQualifiedName(qualifiedName);
-      if (mapping != null) {
-        return mapping.getType();
-      }
-    }
-    return "";
-  }
-
-  /**
    * 导入类依赖
    *
    * @param elementFactory 元素Factory
@@ -405,30 +434,37 @@ public class GeneratorUtils {
     if (!(file instanceof PsiJavaFile)) {
       return;
     }
-
     final PsiJavaFile javaFile = (PsiJavaFile) file;
-    //获取所有导入的包
+
     final PsiImportList importList = javaFile.getImportList();
     if (importList == null) {
       return;
     }
 
-    PsiClass[] psiClasses = PsiShortNamesCache.getInstance(project).getClassesByName(className.getSimpleName(), GlobalSearchScope.allScope(project));
-    PsiClass waiteImportClass = Arrays.stream(psiClasses)
-        .filter(psiClass -> StrUtil.equals(psiClass.getQualifiedName(), className.getQualifiedName()))
-        .findFirst()
-        .orElse(null);
+    PsiClass wantImportClass = getWantImportClass(className);
     //若无导入类，让用户自行处理
-    if (waiteImportClass == null) {
+    if (wantImportClass == null) {
       return;
     }
 
-    //已经导入
-    if (Arrays.stream(importList.getAllImportStatements())
-        .map(is -> is.getImportReference().getQualifiedName())
-        .anyMatch(className.getQualifiedName()::equals)) {
+    if (hasImportClass(importList, className.getQualifiedName())) {
       return;
     }
-    importList.add(elementFactory.createImportStatement(waiteImportClass));
+    importList.add(elementFactory.createImportStatement(wantImportClass));
+  }
+
+  private PsiClass getWantImportClass(ClassName className) {
+    PsiClass[] psiClasses = PsiShortNamesCache.getInstance(project)
+        .getClassesByName(className.getSimpleName(), GlobalSearchScope.allScope(project));
+    return Arrays.stream(psiClasses)
+        .filter(psiClass -> StrUtil.equals(psiClass.getQualifiedName(), className.getQualifiedName()))
+        .findFirst()
+        .orElse(null);
+  }
+
+  private boolean hasImportClass(PsiImportList importList, String qualifiedName) {
+    return Arrays.stream(importList.getAllImportStatements())
+        .map(is -> is.getImportReference().getQualifiedName())
+        .anyMatch(qualifiedName::equals);
   }
 }

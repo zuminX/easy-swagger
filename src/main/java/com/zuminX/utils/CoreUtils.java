@@ -2,30 +2,26 @@ package com.zuminX.utils;
 
 import com.intellij.psi.PsiType;
 import com.zuminX.enums.BaseType;
+import com.zuminX.names.ClassName;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.StringUtils;
 
 @UtilityClass
 public class CoreUtils {
 
+  private static final ClassName MULTIPART_FILE = new ClassName("org.springframework.web.multipart.MultipartFile");
+  private static final ClassName FILE = new ClassName("java.io.File");
+
   public static String getDataType(String dataType, PsiType psiType) {
-    String typeName = BaseType.findByName(dataType);
-    if (StringUtils.isNotEmpty(typeName)) {
-      return typeName;
+    BaseType type = BaseType.findByName(dataType);
+    if (type != null) {
+      return type.getUnboxedName();
     }
-    if (BaseType.isName(dataType)) {
-      return dataType;
-    }
-    String multipartFileText = "org.springframework.web.multipart.MultipartFile";
-    String javaFileText = "java.io.File";
-    if (psiType.getCanonicalText().equals(multipartFileText)
-        || psiType.getCanonicalText().equals(javaFileText)) {
+    if (MULTIPART_FILE.equals(psiType.getCanonicalText()) || FILE.equals(psiType.getCanonicalText())) {
       return "file";
     }
-    // 查找是否实现自File类
     for (PsiType superType : psiType.getSuperTypes()) {
-      if (superType.getCanonicalText().equals(multipartFileText)
-          || superType.getCanonicalText().equals(javaFileText)) {
+      if (MULTIPART_FILE.equals(superType.getCanonicalText()) || FILE.equals(superType.getCanonicalText())) {
         return "file";
       }
     }
@@ -73,7 +69,6 @@ public class CoreUtils {
     }
     return StringUtils.trim(stringBuilder.toString());
   }
-
 
   private static void appendComment(String string, StringBuilder stringBuilder, int index) {
     String lowerCaseStr = string.toLowerCase();

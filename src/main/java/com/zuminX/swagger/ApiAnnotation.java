@@ -1,5 +1,6 @@
 package com.zuminX.swagger;
 
+import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
 import com.zuminX.utils.AnnotationStr;
 import java.util.List;
@@ -23,7 +24,7 @@ public class ApiAnnotation extends AnnotationStr {
   private final Boolean hidden;
 
   @Override
-  protected String getSimpleName() {
-    return SwaggerAnnotation.API.getSimpleName();
+  protected ClassName getClassName() {
+    return SwaggerAnnotation.API;
   }
 }

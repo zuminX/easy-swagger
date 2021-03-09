@@ -1,11 +1,12 @@
 package com.zuminX.enums;
 
 import java.util.Arrays;
-import java.util.Objects;
+import lombok.Getter;
 
 /**
  * 基本类型枚举
  */
+@Getter
 public enum BaseType {
   BYTE("byte", "java.lang.Byte"),
   CHAR("char", "java.lang.Character"),
@@ -15,43 +16,22 @@ public enum BaseType {
   LONG("long", "java.lang.Long"),
   SHORT("short", "java.lang.Short"),
   BOOLEAN("boolean", "java.lang.Boolean"),
-
   STRING("string", "java.lang.String"),
   ;
 
-  private String name;
-  private String boxedTypeName;
+  private final String unboxedName;
+  private final String qualifiedName;
 
-  BaseType(String name, String boxedTypeName) {
-    this.name = name;
-    this.boxedTypeName = boxedTypeName;
+  BaseType(String unboxedName, String qualifiedName) {
+    this.unboxedName = unboxedName;
+    this.qualifiedName = qualifiedName;
   }
 
-  public static String findByName(String boxedTypeName) {
+  public static BaseType findByName(String name) {
     return Arrays.stream(values())
-        .filter(type -> Objects.equals(type.getBoxedTypeName(), boxedTypeName))
+        .filter(type -> type.getQualifiedName().equals(name) || type.getUnboxedName().equals(name))
         .findFirst()
-        .map(BaseType::getName)
-        .orElse("");
+        .orElse(null);
   }
 
-  public static boolean isName(String name) {
-    return Arrays.stream(values()).anyMatch(type -> Objects.equals(type.getName(), name));
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getBoxedTypeName() {
-    return boxedTypeName;
-  }
-
-  public void setBoxedTypeName(String boxedTypeName) {
-    this.boxedTypeName = boxedTypeName;
-  }
 }

@@ -1,5 +1,6 @@
 package com.zuminX.swagger;
 
+import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
 import com.zuminX.utils.AnnotationStr;
 import lombok.Builder;
@@ -42,7 +43,7 @@ public class ApiImplicitParamAnnotation extends AnnotationStr {
   private final String collectionFormat;
 
   @Override
-  protected String getSimpleName() {
-    return SwaggerAnnotation.API_IMPLICIT_PARAM.getSimpleName();
+  protected ClassName getClassName() {
+    return SwaggerAnnotation.API_IMPLICIT_PARAM;
   }
 }

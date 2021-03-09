@@ -1,5 +1,6 @@
 package com.zuminX.swagger;
 
+import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
 import com.zuminX.utils.AnnotationStr;
 import lombok.Builder;
@@ -34,7 +35,7 @@ public class ApiModelPropertyAnnotation extends AnnotationStr {
   private final Boolean allowEmptyValue;
 
   @Override
-  protected String getSimpleName() {
-    return SwaggerAnnotation.API_MODEL_PROPERTY.getSimpleName();
+  protected ClassName getClassName() {
+    return SwaggerAnnotation.API_MODEL_PROPERTY;
   }
 }

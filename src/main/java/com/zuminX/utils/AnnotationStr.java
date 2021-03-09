@@ -2,6 +2,7 @@ package com.zuminX.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
+import com.zuminX.names.ClassName;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,11 +14,11 @@ import lombok.SneakyThrows;
 public abstract class AnnotationStr {
 
   /**
-   * 获取该注解的简单类名
+   * 获取该注解的类名对象
    *
-   * @return 简单类名
+   * @return 类名对象
    */
-  protected abstract String getSimpleName();
+  protected abstract ClassName getClassName();
 
   /**
    * 获取无内容的注解字符串
@@ -25,7 +26,7 @@ public abstract class AnnotationStr {
    * @return 注解字符串
    */
   public String empty() {
-    return "@" + getSimpleName();
+    return "@" + getClassName().getSimpleName();
   }
 
   /**
