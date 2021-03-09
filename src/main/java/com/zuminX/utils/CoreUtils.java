@@ -29,7 +29,9 @@ public class CoreUtils {
   }
 
   /**
-   * 获取注解说明  不写/@desc/@describe/@description
+   * 获取注释说明
+   * <p />
+   * 不写/@desc/@describe/@description
    *
    * @param comment 所有注释
    * @return String

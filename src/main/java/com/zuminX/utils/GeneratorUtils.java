@@ -1,5 +1,8 @@
 package com.zuminX.utils;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -19,7 +22,9 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiType;
+import com.intellij.psi.infos.CandidateInfo;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -36,6 +41,7 @@ import com.zuminX.swagger.ApiModelPropertyAnnotation;
 import com.zuminX.swagger.ApiOperationAnnotation;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -137,7 +143,7 @@ public class GeneratorUtils {
   private PsiMethod findMethodByName(PsiClass psiClass, String name) {
     PsiMethod[] methods = psiClass.getMethods();
     return Arrays.stream(methods)
-        .filter(psiMethod -> com.jgoodies.common.base.Objects.equals(name, psiMethod.getName()))
+        .filter(psiMethod -> ObjectUtil.equals(name, psiMethod.getName()))
         .findFirst()
         .orElse(null);
   }
@@ -152,7 +158,7 @@ public class GeneratorUtils {
   private PsiField findFieldByNameIdentifier(PsiClass psiClass, String nameIdentifier) {
     PsiField[] fields = psiClass.getAllFields();
     return Arrays.stream(fields)
-        .filter(psiField -> com.jgoodies.common.base.Objects.equals(nameIdentifier, psiField.getNameIdentifier().getText()))
+        .filter(psiField -> ObjectUtil.equals(nameIdentifier, psiField.getNameIdentifier().getText()))
         .findFirst()
         .orElse(null);
   }
@@ -230,17 +236,10 @@ public class GeneratorUtils {
    * @param psiClass Psi类
    */
   private void generateControllerClassAnnotation(PsiClass psiClass) {
-    List<PsiComment> commentList = getCommentByClass(psiClass);
-    if (commentList.isEmpty()) {
-      String fieldValue = getMappingAttribute(psiClass.getModifierList().getAnnotations(), MAPPING_VALUE);
-      doWrite(ApiAnnotation.builder().value(fieldValue).build(), psiClass);
-      return;
-    }
-    commentList.stream().map(comment -> CoreUtils.getCommentDesc(comment.getText())).forEach(commentDesc -> {
-      String fieldValue = getMappingAttribute(psiClass.getModifierList().getAnnotations(), MAPPING_VALUE);
-      AnnotationStr annotationStr = ApiAnnotation.builder().value(fieldValue).tags(Collections.singletonList(commentDesc)).build();
-      doWrite(annotationStr, psiClass);
-    });
+    String commentDesc = getCommentDesc(getFirstComment(psiClass));
+    List<String> tags = commentDesc == null ? null : Collections.singletonList(commentDesc);
+    String fieldValue = getMappingAttribute(psiClass.getModifierList().getAnnotations(), MAPPING_VALUE);
+    doWrite(ApiAnnotation.builder().value(fieldValue).tags(tags).build(), psiClass);
   }
 
   /**
@@ -249,15 +248,8 @@ public class GeneratorUtils {
    * @param psiClass Psi类
    */
   private void generateDomainClassAnnotation(PsiClass psiClass) {
-    List<PsiComment> commentList = getCommentByClass(psiClass);
-    if (commentList.isEmpty()) {
-      doWrite(ApiModelAnnotation.builder().build(), psiClass);
-      return;
-    }
-    for (PsiComment comment : commentList) {
-      String commentDesc = CoreUtils.getCommentDesc(comment.getText());
-      doWrite(ApiModelAnnotation.builder().description(commentDesc).build(), psiClass);
-    }
+    PsiComment comment = getFirstComment(psiClass);
+    doWrite(ApiModelAnnotation.builder().description(getCommentDesc(comment)).build(), psiClass);
   }
 
   /**
@@ -279,14 +271,11 @@ public class GeneratorUtils {
   private void generateMethodOperationAnnotation(PsiMethod psiMethod) {
     PsiAnnotation[] psiAnnotations = psiMethod.getModifierList().getAnnotations();
     String methodValue = getMappingAttribute(psiAnnotations, MAPPING_METHOD);
-    if (StrUtil.isNotEmpty(methodValue)) {
-      methodValue = methodValue.substring(methodValue.indexOf(".") + 1);
-    }
     //如果存在注解，获取注解原本的value和notes内容
     PsiAnnotation apiOperationExist = psiMethod.getModifierList().findAnnotation(SwaggerAnnotation.API_OPERATION.getQualifiedName());
     AnnotationStr annotationStr = ApiOperationAnnotation.builder()
-        .value(getAttribute(apiOperationExist, "value"))
-        .notes(getAttribute(apiOperationExist, "notes"))
+        .value(Convert.toStr(getAnnotationMemberValue(apiOperationExist, "value"), ""))
+        .notes(getAnnotationMemberValue(apiOperationExist, "notes"))
         .httpMethod(methodValue).build();
     doWrite(annotationStr, psiMethod);
   }
@@ -336,36 +325,42 @@ public class GeneratorUtils {
    * @param psiField Psi字段
    */
   private void generateFieldAnnotation(PsiField psiField) {
-    List<PsiComment> commentList = getCommentByField(psiField);
-    if (commentList.isEmpty()) {
-      doWrite(ApiModelPropertyAnnotation.builder().value("").build(), psiField);
-      return;
-    }
-    commentList.stream()
-        .map(PsiElement::getText)
-        .map(CoreUtils::getCommentDesc)
-        .map(commentDesc -> ApiModelPropertyAnnotation.builder().value(commentDesc).build())
-        .forEach(annotationStr -> doWrite(annotationStr, psiField));
+    PsiComment comment = getFirstComment(psiField);
+    doWrite(ApiModelPropertyAnnotation.builder().value(getCommentDesc(comment)).build(), psiField);
+  }
+
+  /**
+   * 获取注释说明
+   *
+   * @param comment Psi注释
+   * @return 注释字符串
+   */
+  private String getCommentDesc(PsiComment comment) {
+    return comment != null ? CoreUtils.getCommentDesc(comment.getText()) : null;
   }
 
   /**
    * 从Psi字段中获取注释
+   * <p/>
+   * 若存在多个注释，则选取第一个
    *
    * @param psiField Psi字段
-   * @return Psi注释列表
+   * @return Psi注释
    */
-  private List<PsiComment> getCommentByField(PsiField psiField) {
-    return getCommentByElement(psiField.getChildren());
+  private PsiComment getFirstComment(PsiField psiField) {
+    return CollUtil.getFirst(getCommentByElement(psiField.getChildren()));
   }
 
   /**
    * 从Psi类中获取注释
+   * <p/>
+   * 若存在多个注释，则选取第一个
    *
    * @param psiClass Psi方法
-   * @return Psi注释列表
+   * @return Psi注释
    */
-  private List<PsiComment> getCommentByClass(PsiClass psiClass) {
-    return getCommentByElement(psiClass.getChildren());
+  private PsiComment getFirstComment(PsiClass psiClass) {
+    return CollUtil.getFirst(getCommentByElement(psiClass.getChildren()));
   }
 
   /**
@@ -400,27 +395,51 @@ public class GeneratorUtils {
       }
     }
     if (mappingAnnotation == null) {
-      return "";
+      return null;
     }
     if (MappingAnnotation.REQUEST_MAPPING.equals(mappingAnnotation)) {
-      return getAttribute(psiAnnotation, attributeName);
+      List<PsiField> psiFields = getFieldOfAnnotationMemberValue(psiAnnotation, attributeName);
+      return psiFields.isEmpty() ? null : psiFields.get(0).getName();
     }
     return mappingAnnotation.getType();
   }
 
   /**
-   * 获取注解属性
+   * 获取注解属性值
    *
    * @param psiAnnotation 注解全路径
    * @param attributeName 注解属性名
    * @return 属性值
    */
-  private String getAttribute(PsiAnnotation psiAnnotation, String attributeName) {
+  private String getAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
     if (psiAnnotation == null) {
-      return "";
+      return null;
     }
     PsiAnnotationMemberValue psiAnnotationMemberValue = psiAnnotation.findDeclaredAttributeValue(attributeName);
-    return psiAnnotationMemberValue == null ? "" : psiAnnotationMemberValue.getText();
+    return psiAnnotationMemberValue == null ? null : psiAnnotationMemberValue.getText();
+  }
+
+  /**
+   * 获取注释成员值的Psi字段
+   *
+   * @param psiAnnotation 注解全路径
+   * @param attributeName 注解属性名
+   */
+  private List<PsiField> getFieldOfAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
+    PsiAnnotationMemberValue psiAnnotationMemberValue = psiAnnotation.findDeclaredAttributeValue(attributeName);
+    if (psiAnnotationMemberValue == null) {
+      return ListUtil.empty();
+    }
+    return Arrays.stream(psiAnnotationMemberValue.getChildren())
+        .flatMap(child -> Arrays.stream(child.getReferences()))
+        .map(PsiReference::resolveReference)
+        .flatMap(Collection::stream)
+        .filter(resolveResult -> resolveResult instanceof CandidateInfo)
+        .map(resolveResult -> (CandidateInfo) resolveResult)
+        .map(CandidateInfo::getElement)
+        .filter(psiElement -> psiElement instanceof PsiField)
+        .map(psiElement -> (PsiField) psiElement)
+        .collect(Collectors.toList());
   }
 
   /**
