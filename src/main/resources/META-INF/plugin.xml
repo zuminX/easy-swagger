@@ -9,7 +9,7 @@
     <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
+        <notificationGroup id="Easy Swagger Notification Group" displayType="BALLOON" key="notification.group.name"/>
     </extensions>
 
     <actions>

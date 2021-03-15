@@ -19,8 +19,7 @@ public class ClassName {
   private final String qualifiedName;
 
   public String getSimpleName() {
-    int index = qualifiedName.lastIndexOf('.');
-    return index == -1 ? qualifiedName : qualifiedName.substring(index + 1);
+    return PublicUtils.getSimpleNameByQualifiedName(qualifiedName);
   }
 
   @SneakyThrows

@@ -1,36 +1,17 @@
 package com.zuminX.utils;
 
-import com.intellij.psi.PsiType;
-import com.zuminX.enums.BaseType;
-import com.zuminX.names.ClassName;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * 核心工具类
+ */
 @UtilityClass
 public class CoreUtils {
 
-  private static final ClassName MULTIPART_FILE = new ClassName("org.springframework.web.multipart.MultipartFile");
-  private static final ClassName FILE = new ClassName("java.io.File");
-
-  public static String getDataType(String dataType, PsiType psiType) {
-    BaseType type = BaseType.findByName(dataType);
-    if (type != null) {
-      return type.getUnboxedName();
-    }
-    if (MULTIPART_FILE.equals(psiType.getCanonicalText()) || FILE.equals(psiType.getCanonicalText())) {
-      return "file";
-    }
-    for (PsiType superType : psiType.getSuperTypes()) {
-      if (MULTIPART_FILE.equals(superType.getCanonicalText()) || FILE.equals(superType.getCanonicalText())) {
-        return "file";
-      }
-    }
-    return null;
-  }
-
   /**
    * 获取注释说明
-   * <p />
+   * <p/>
    * 不写/@desc/@describe/@description
    *
    * @param comment 所有注释
