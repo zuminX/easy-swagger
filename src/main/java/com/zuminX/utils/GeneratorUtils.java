@@ -28,17 +28,19 @@ import com.intellij.psi.infos.CandidateInfo;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.zuminX.annotations.AnnotationStr;
+import com.zuminX.annotations.swagger.ApiAnnotation;
+import com.zuminX.annotations.swagger.ApiImplicitParamAnnotation;
+import com.zuminX.annotations.swagger.ApiImplicitParamsAnnotation;
+import com.zuminX.annotations.swagger.ApiModelAnnotation;
+import com.zuminX.annotations.swagger.ApiModelPropertyAnnotation;
+import com.zuminX.annotations.swagger.ApiOperationAnnotation;
 import com.zuminX.names.ClassName;
 import com.zuminX.names.ControllerAnnotation;
 import com.zuminX.names.MappingAnnotation;
 import com.zuminX.names.RequestAnnotation;
 import com.zuminX.names.SwaggerAnnotation;
-import com.zuminX.swagger.ApiAnnotation;
-import com.zuminX.swagger.ApiImplicitParamAnnotation;
-import com.zuminX.swagger.ApiImplicitParamsAnnotation;
-import com.zuminX.swagger.ApiModelAnnotation;
-import com.zuminX.swagger.ApiModelPropertyAnnotation;
-import com.zuminX.swagger.ApiOperationAnnotation;
+import com.zuminX.service.Notify;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -117,7 +119,7 @@ public class GeneratorUtils {
    */
   private void generate(Runnable runnable) {
     if (unableToGenerate()) {
-      NotifyUtils.notifyError("无法生成Swagger注解");
+      Notify.getInstance(project).error("无法生成Swagger注解");
       return;
     }
     WriteCommandAction.runWriteCommandAction(project, runnable);
@@ -362,7 +364,7 @@ public class GeneratorUtils {
       return null;
     }
     if (psiFields.size() > 1) {
-      NotifyUtils.notifyWarring("@ApiOperation中的httpMethod属性无法支持多个请求类型");
+      Notify.getInstance(project).warning("@ApiOperation中的httpMethod属性无法支持多个请求类型");
     }
     return psiFields.get(0).getName();
   }

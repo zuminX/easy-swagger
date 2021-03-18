@@ -18,10 +18,6 @@ public class ClassName {
 
   private final String qualifiedName;
 
-  public String getSimpleName() {
-    return PublicUtils.getSimpleNameByQualifiedName(qualifiedName);
-  }
-
   @SneakyThrows
   protected static <T extends ClassName> List<T> getAll(@NotNull Class<T> clazz) {
     List<Field> fields = PublicUtils.getField(clazz,
@@ -41,6 +37,10 @@ public class ClassName {
   @SneakyThrows
   private static <T extends ClassName> T getStaticFieldValue(Field field) {
     return (T) field.get(null);
+  }
+
+  public String getSimpleName() {
+    return PublicUtils.getSimpleNameByQualifiedName(qualifiedName);
   }
 
   public boolean equals(String name) {

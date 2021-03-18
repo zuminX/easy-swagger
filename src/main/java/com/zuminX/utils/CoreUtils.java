@@ -1,5 +1,15 @@
 package com.zuminX.utils;
 
+import cn.hutool.core.collection.EnumerationIter;
+import cn.hutool.core.util.ClassLoaderUtil;
+import cn.hutool.core.util.ClassUtil;
+import com.zuminX.constant.consist.SystemConstants;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.StringUtils;
 
@@ -8,6 +18,22 @@ import org.apache.commons.lang.StringUtils;
  */
 @UtilityClass
 public class CoreUtils {
+
+  /**
+   * 获取项目的所有实现clazz的Class
+   *
+   * @param clazz 类对象
+   * @return Class集合
+   */
+  public static Set<Class<?>> getClasses(Class<?> clazz) {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(ClassLoaderUtil.class.getClassLoader());
+
+    Set<Class<?>> result = ClassUtil.scanPackageBySuper(SystemConstants.PROJECT_PACKAGE_NAME, clazz);
+
+    Thread.currentThread().setContextClassLoader(contextClassLoader);
+    return result;
+  }
 
   /**
    * 获取注释说明

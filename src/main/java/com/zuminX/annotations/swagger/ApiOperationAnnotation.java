@@ -1,8 +1,8 @@
-package com.zuminX.swagger;
+package com.zuminX.annotations.swagger;
 
 import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
-import com.zuminX.utils.AnnotationStr;
+import com.zuminX.annotations.AnnotationStr;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,7 +40,7 @@ public class ApiOperationAnnotation extends AnnotationStr {
   private final Boolean ignoreJsonView;
 
   @Override
-  protected ClassName getClassName() {
+  public ClassName getClassName() {
     return SwaggerAnnotation.API_OPERATION;
   }
 }

@@ -1,21 +1,27 @@
 <idea-plugin>
-    <id>com.github.zuminX.easy-swagger</id>
-    <name>zuminX</name>
-    <vendor email="1215287120@qq.com" url="http://www.github.com/zuminX">GitHub</vendor>
+  <id>com.github.zuminX.easy-swagger</id>
+  <name>zuminX</name>
+  <vendor email="1215287120@qq.com" url="http://www.github.com/zuminX">GitHub</vendor>
 
-    <description>TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST</description>
+  <description>TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST</description>
 
-    <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.java</depends>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.java</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <notificationGroup id="Easy Swagger Notification Group" displayType="BALLOON" key="notification.group.name"/>
-    </extensions>
+  <extensions defaultExtensionNs="com.intellij">
+    <notificationGroup id="Easy Swagger Notification Group" displayType="BALLOON" key="notification.group.name"/>
 
-    <actions>
-        <action id="com.zuminX.SwaggerTool" class="com.zuminX.SwaggerTool" text="SwaggerAnnotation"
-          description="Generate swagger annotation">
-            <add-to-group group-id="GenerateGroup" anchor="first"/>
-        </action>
-    </actions>
+
+    <applicationService serviceImplementation="com.zuminX.configuration.SwaggerSetting"/>
+
+    <applicationConfigurable parentId="tools" instance="com.zuminX.configuration.SwaggerSettingConfigurable"
+      id="com.zuminX.configuration.SwaggerSettingConfigurable" dynamic="true"/>
+  </extensions>
+
+  <actions>
+    <action id="com.zuminX.actions.GeneratorSwaggerAction" class="com.zuminX.actions.GeneratorSwaggerAction"
+      text="SwaggerAnnotation" description="Generate swagger annotation">
+      <add-to-group group-id="GenerateGroup" anchor="first"/>
+    </action>
+  </actions>
 </idea-plugin>

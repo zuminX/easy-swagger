@@ -1,4 +1,4 @@
-package com.zuminX;
+package com.zuminX.actions;
 
 import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -9,9 +9,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
 import com.zuminX.utils.GeneratorUtils;
-import com.zuminX.utils.NotifyUtils;
 
-public class SwaggerTool extends AnAction {
+public class GeneratorSwaggerAction extends AnAction {
 
   @Override
   public void actionPerformed(AnActionEvent anActionEvent) {
@@ -21,8 +20,6 @@ public class SwaggerTool extends AnAction {
     Editor editor = anActionEvent.getData(PlatformDataKeys.EDITOR);
     assert editor != null;
     assert project != null;
-
-    NotifyUtils.setProject(project);
 
     PsiFile psiFile = PsiUtilBase.getPsiFileInEditor(editor, project);
 

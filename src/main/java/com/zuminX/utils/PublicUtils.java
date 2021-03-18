@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 公共工具类
@@ -48,6 +49,27 @@ public class PublicUtils {
     }
     int index = qualifiedName.lastIndexOf('.');
     return index == -1 ? qualifiedName : qualifiedName.substring(index + 1);
+  }
+
+  /**
+   * 获取合法的数组下标
+   *
+   * @param array 数组
+   * @param index 给定的下标（可能越界）
+   * @param <T>   泛型
+   * @return 下标
+   */
+  public static <T> int getLegalSubscript(@NotNull T[] array, Integer index) {
+    if (index == null) {
+      return 0;
+    }
+    if (index < 0) {
+      return 0;
+    }
+    if (index >= array.length) {
+      return array.length - 1;
+    }
+    return index;
   }
 
   /**

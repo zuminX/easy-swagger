@@ -1,8 +1,9 @@
-package com.zuminX.utils;
+package com.zuminX.annotations;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import com.zuminX.names.ClassName;
+import com.zuminX.utils.PublicUtils;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ public abstract class AnnotationStr {
    *
    * @return 类名对象
    */
-  protected abstract ClassName getClassName();
+  public abstract ClassName getClassName();
 
   /**
    * 获取无内容的注解字符串
