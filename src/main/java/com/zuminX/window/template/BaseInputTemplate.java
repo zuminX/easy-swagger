@@ -10,39 +10,37 @@
  */
 package com.zuminX.window.template;
 
-import cn.hutool.core.convert.ConverterRegistry;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Matcher;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
-import com.zuminX.beans.settings.SettingKey;
-import com.zuminX.beans.settings.Settings;
+import com.zuminX.settings.SettingKey;
+import com.zuminX.settings.Settings;
+import com.zuminX.utils.PublicUtils;
 import com.zuminX.window.Option;
 import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BaseInput<T> extends JPanel implements Option {
+public class BaseInputTemplate<T> extends JPanel implements Option {
 
   public final SettingKey<T> key;
-  private final Integer topInset;
-
   @Getter
   private final JBTextField textField;
 
-  private final Verify<T> verify;
+  private final Matcher<T> verify;
 
-  protected BaseInput(@Nullable T defaultValue, @NotNull SettingKey<T> key, Verify<T> verify, boolean labelOnTop) {
-    this(key.getName(), defaultValue, key, null, verify, labelOnTop);
+  protected BaseInputTemplate(@Nullable T defaultValue, @NotNull SettingKey<T> key, Matcher<T> verify, boolean labelOnTop) {
+    this(key.getName(), defaultValue, key, verify, labelOnTop);
   }
 
-  protected BaseInput(@NotNull String label, @Nullable T defaultValue, @NotNull SettingKey<T> key, Integer topInset, Verify<T> verify,
+  protected BaseInputTemplate(@NotNull String label, @Nullable T defaultValue, @NotNull SettingKey<T> key, Matcher<T> verify,
       boolean labelOnTop) {
     super(new FlowLayout(FlowLayout.LEFT));
     this.key = key;
-    this.topInset = topInset;
     this.textField = new JBTextField(toString(defaultValue));
     this.verify = verify;
 
@@ -64,7 +62,7 @@ public abstract class BaseInput<T> extends JPanel implements Option {
     if (value == null) {
       return;
     }
-    if (verify != null && !verify.check(value)) {
+    if (verify != null && !verify.match(value)) {
       return;
     }
     setting.putData(this.key, value);
@@ -77,7 +75,9 @@ public abstract class BaseInput<T> extends JPanel implements Option {
    * @return String
    */
   @Nullable
-  protected abstract String toString(T data);
+  protected String toString(T data) {
+    return Convert.convertQuietly(String.class, data);
+  }
 
   /**
    * String -> T
@@ -86,26 +86,12 @@ public abstract class BaseInput<T> extends JPanel implements Option {
    * @return T
    */
   @Nullable
-  protected abstract T fromString(String data);
-
-  @Nullable
-  @Override
-  public Integer getTopInset() {
-    return this.topInset;
+  protected T fromString(String data) {
+    //TODO 问题？
+    return Convert.convertQuietly(PublicUtils.getFirstGenericType(this), data);
   }
 
   protected void appendInputVerify(@NotNull KeyAdapter adapter) {
     this.textField.addKeyListener(adapter);
-  }
-
-  public interface Verify<T> {
-
-    /**
-     * 验证内容
-     *
-     * @param data 验证数据
-     * @return bool
-     */
-    boolean check(@Nullable T data);
   }
 }

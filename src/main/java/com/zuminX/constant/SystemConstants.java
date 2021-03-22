@@ -1,4 +1,4 @@
-package com.zuminX.constant.consist;
+package com.zuminX.constant;
 
 /**
  * 系统常量

@@ -10,9 +10,10 @@
  */
 package com.zuminX.window.template;
 
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.util.ui.FormBuilder;
-import com.zuminX.beans.settings.SettingKey;
-import com.zuminX.beans.settings.Settings;
+import com.zuminX.settings.SettingKey;
+import com.zuminX.settings.Settings;
 import com.zuminX.window.Option;
 import java.awt.FlowLayout;
 import java.util.Arrays;
@@ -21,25 +22,19 @@ import javax.swing.JPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ComboBox<T> extends JPanel implements Option {
+public class ComboBoxTemplate<T> extends JPanel implements Option {
 
   public final SettingKey<T> key;
-  private final com.intellij.openapi.ui.ComboBox<T> comboBox;
-  private final Integer topInset;
+  private final ComboBox<T> comboBox;
 
-  public ComboBox(@NotNull T[] data, @NotNull SettingKey<T> key) {
-    this(data, key, null);
+  public ComboBoxTemplate(@NotNull T[] data, @NotNull SettingKey<T> key) {
+    this(data, key, new JComponent[0]);
   }
 
-  public ComboBox(@NotNull T[] data, @NotNull SettingKey<T> key, @Nullable Integer topInset) {
-    this(data, key, topInset, new JComponent[0]);
-  }
-
-  public ComboBox(@NotNull T[] data, @NotNull SettingKey<T> key, @Nullable Integer topInset, @NotNull JComponent... components) {
+  public ComboBoxTemplate(@NotNull T[] data, @NotNull SettingKey<T> key, @NotNull JComponent... components) {
     super();
-    comboBox = new com.intellij.openapi.ui.ComboBox<>(data);
+    comboBox = new ComboBox<>(data);
     this.key = key;
-    this.topInset = topInset;
 
     FormBuilder builder = FormBuilder.createFormBuilder()
         .addLabeledComponent(key.getName(), comboBox);
@@ -77,9 +72,4 @@ public class ComboBox<T> extends JPanel implements Option {
     comboBox.setSelectedItem(item);
   }
 
-  @Nullable
-  @Override
-  public Integer getTopInset() {
-    return this.topInset;
-  }
 }

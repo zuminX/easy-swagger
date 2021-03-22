@@ -8,9 +8,11 @@
   <author>          <time>          <version>          <desc>
   作者姓名            修改时间           版本号              描述
  */
-package com.zuminX.beans.settings;
+package com.zuminX.settings;
 
-import com.zuminX.beans.Key;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.convert.ConverterRegistry;
+import com.zuminX.convert.AnnotationItemMapConvert;
 import com.zuminX.utils.CoreUtils;
 import com.zuminX.window.Option;
 import com.zuminX.window.OptionForm;
@@ -35,7 +37,7 @@ public class Settings {
   public Map<String, String> properties = new HashMap<>();
 
   /**
-   * 获取所以设置项
+   * 获取所有设置项
    *
    * @return list views
    */
@@ -76,14 +78,17 @@ public class Settings {
     setting.properties.forEach(this.properties::put);
   }
 
+  @SneakyThrows
   public <T> T getData(@NotNull SettingKey<T> key) {
-    if (this.properties.containsKey(key.getName())) {
-      return key.getConverter().convert(this.properties.get(key.getName()), null);
+    String value = this.properties.get(key.getName());
+    T defaultValue = key.getDefaultData();
+    if (value == null) {
+      return defaultValue;
     }
-    return key.getDefaultData();
+    return Convert.convert(defaultValue.getClass(), value, defaultValue);
   }
 
-  public <T> void putData(@NotNull SettingKey<T> key, @NotNull T value) {
+  public <T> void putData(@NotNull SettingKey<T> key, @NotNull Object value) {
     this.properties.put(key.getName(), value.toString());
   }
 
@@ -97,6 +102,7 @@ public class Settings {
   }
 
   public void initValue() {
+    //TODO toString()会导致无法正常序列化
     Key.getAllKeys().values().forEach(key -> this.properties.put(key.getName(), key.getDefaultData().toString()));
   }
 

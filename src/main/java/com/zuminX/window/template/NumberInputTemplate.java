@@ -10,7 +10,8 @@
  */
 package com.zuminX.window.template;
 
-import com.zuminX.beans.settings.SettingKey;
+import cn.hutool.core.lang.Matcher;
+import com.zuminX.settings.SettingKey;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -18,31 +19,29 @@ import javax.swing.JTextField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class NumberInput extends BaseInput<Number> {
+public class NumberInputTemplate extends BaseInputTemplate<Number> {
 
   private boolean withDouble = false;
 
-  public NumberInput(@Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Verify<Number> verify, boolean withDouble) {
+  public NumberInputTemplate(@Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<Number> verify, boolean withDouble) {
     super(defaultValue, key, verify, false);
     this.withDouble = withDouble;
     initVerify();
   }
 
-  public NumberInput(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Integer topInset,
-      Verify<Number> verify, boolean withDouble) {
-    super(label, defaultValue, key, topInset, verify, false);
+  public NumberInputTemplate(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<Number> verify, boolean withDouble) {
+    super(label, defaultValue, key, verify, false);
     this.withDouble = withDouble;
     initVerify();
   }
 
-  public NumberInput(@Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Verify<Number> verify) {
+  public NumberInputTemplate(@Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<Number> verify) {
     super(defaultValue, key, verify, false);
     initVerify();
   }
 
-  public NumberInput(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Integer topInset,
-      Verify<Number> verify) {
-    super(label, defaultValue, key, topInset, verify, false);
+  public NumberInputTemplate(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<Number> verify) {
+    super(label, defaultValue, key, verify, false);
     initVerify();
   }
 
@@ -68,21 +67,5 @@ public class NumberInput extends BaseInput<Number> {
         }
       }
     });
-  }
-
-  @Nullable
-  @Override
-  protected String toString(Number data) {
-    return data != null ? data.toString() : null;
-  }
-
-  @Nullable
-  @Override
-  protected Number fromString(String data) {
-    try {
-      return Integer.parseInt(data);
-    } catch (NumberFormatException e) {
-      return null;
-    }
   }
 }

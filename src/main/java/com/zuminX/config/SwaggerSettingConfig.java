@@ -8,19 +8,19 @@
   <author>          <time>          <version>          <desc>
   作者姓名            修改时间           版本号              描述
  */
-package com.zuminX.configuration;
+package com.zuminX.config;
 
 import com.intellij.openapi.options.Configurable;
-import com.zuminX.beans.settings.Settings;
-import com.zuminX.constant.consist.SystemConstants;
+import com.zuminX.constant.SystemConstants;
+import com.zuminX.settings.Settings;
 import com.zuminX.window.SwaggerSettingWindow;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
-public class SwaggerSettingConfigurable implements Configurable {
+public class SwaggerSettingConfig implements Configurable {
 
-  private SwaggerSettingWindow settingsComponent;
+  private SwaggerSettingWindow settingsComponent ;
 
   @Nls(capitalization = Nls.Capitalization.Title)
   @Override
@@ -42,7 +42,12 @@ public class SwaggerSettingConfigurable implements Configurable {
 
   @Override
   public boolean isModified() {
-    return SwaggerSetting.getInstance().isModified(settingsComponent.getAppSetting());
+    if (settingsComponent == null) {
+      return false;
+    }
+    SwaggerSetting instance = SwaggerSetting.getInstance();
+    Settings appSetting = settingsComponent.getAppSetting();
+    return instance.isModified(appSetting);
   }
 
   @Override

@@ -8,7 +8,7 @@
   <author>          <time>          <version>          <desc>
   作者姓名            修改时间           版本号              描述
  */
-package com.zuminX.beans;
+package com.zuminX.settings;
 
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.IntObjectMap;
@@ -39,7 +39,6 @@ public class Key<T> {
   }
 
   @NotNull
-  @Contract(value = "_, _ -> new", pure = true)
   public static <T> Key<T> create(@NotNull String name, @NotNull T defaultData) {
     return new Key<>(name, defaultData);
   }

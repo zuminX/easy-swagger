@@ -20,6 +20,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.4'
 
     compile 'cn.hutool:hutool-core:5.5.9'
+    compile 'cn.hutool:hutool-json:5.5.9'
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/

@@ -2,14 +2,18 @@ package com.zuminX.utils;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 公共工具类
@@ -70,6 +74,17 @@ public class PublicUtils {
       return array.length - 1;
     }
     return index;
+  }
+
+  /**
+   * 获取包含泛型参数的对象的第一个泛型
+   *
+   * @param object 对象
+   * @return 泛型对应的Class，若不存在则返回null
+   */
+  @Nullable
+  public static Type getFirstGenericType(@NotNull Object object) {
+    return TypeUtil.getTypeArgument(object.getClass());
   }
 
   /**

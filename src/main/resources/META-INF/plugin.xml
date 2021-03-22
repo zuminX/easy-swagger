@@ -11,11 +11,12 @@
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup id="Easy Swagger Notification Group" displayType="BALLOON" key="notification.group.name"/>
 
+    <applicationService serviceImplementation="com.zuminX.config.SwaggerSetting"/>
 
-    <applicationService serviceImplementation="com.zuminX.configuration.SwaggerSetting"/>
+    <applicationInitializedListener implementation="com.zuminX.config.GlobalConvertConfig" id="GlobalConvertConfig" />
 
-    <applicationConfigurable parentId="tools" instance="com.zuminX.configuration.SwaggerSettingConfigurable"
-      id="com.zuminX.configuration.SwaggerSettingConfigurable" dynamic="true"/>
+    <applicationConfigurable parentId="tools" instance="com.zuminX.config.SwaggerSettingConfig" id="SwaggerSettingConfig"
+      dynamic="true"/>
   </extensions>
 
   <actions>

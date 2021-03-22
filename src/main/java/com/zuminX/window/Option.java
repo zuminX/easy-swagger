@@ -10,10 +10,8 @@
  */
 package com.zuminX.window;
 
-import com.zuminX.beans.settings.Settings;
-import javax.swing.JComponent;
+import com.zuminX.settings.Settings;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public interface Option {
 
@@ -31,44 +29,4 @@ public interface Option {
    */
   void applySetting(@NotNull Settings setting);
 
-  /**
-   * 获取顶部间距
-   *
-   * @return int
-   */
-  @Nullable
-  default Integer getTopInset() {
-    return null;
-  }
-
-  interface Custom<T extends JComponent> {
-
-    /**
-     * 显示设置
-     *
-     * @param setting   设置信息
-     * @param component 组件
-     * @return true: 启用 | false: 执行原本逻辑
-     */
-    boolean showSetting(@NotNull Settings setting, @NotNull T component);
-
-    /**
-     * 应用设置
-     *
-     * @param setting   设置信息
-     * @param component 组件
-     * @return true: 启用 | false: 执行原本逻辑
-     */
-    boolean applySetting(@NotNull Settings setting, @NotNull T component);
-
-    /**
-     * 获取顶部间距
-     *
-     * @return int
-     */
-    @Nullable
-    default Integer getTopInset() {
-      return null;
-    }
-  }
 }

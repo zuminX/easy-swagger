@@ -11,30 +11,23 @@
 package com.zuminX.window.template;
 
 import com.intellij.ui.components.JBCheckBox;
-import com.zuminX.beans.settings.SettingKey;
-import com.zuminX.beans.settings.Settings;
+import com.zuminX.settings.SettingKey;
+import com.zuminX.settings.Settings;
 import com.zuminX.window.Option;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class CheckBox extends JBCheckBox implements Option {
+public class CheckBoxTemplate extends JBCheckBox implements Option {
 
   public final SettingKey<Boolean> key;
-  private final Integer topInset;
 
-  public CheckBox(@NotNull SettingKey<Boolean> key, @Nullable Integer topInset) {
-    this(key.getName(), key, topInset);
+  public CheckBoxTemplate(@NotNull SettingKey<Boolean> key) {
+    this(key.getName(), key);
   }
 
-  public CheckBox(@Nls @NotNull String title, @NotNull SettingKey<Boolean> key) {
-    this(title, key, null);
-  }
-
-  public CheckBox(@Nls @NotNull String title, @NotNull SettingKey<Boolean> key, @Nullable Integer topInset) {
+  public CheckBoxTemplate(@Nls @NotNull String title, @NotNull SettingKey<Boolean> key) {
     super(title);
     this.key = key;
-    this.topInset = topInset;
   }
 
   @Override
@@ -45,11 +38,5 @@ public class CheckBox extends JBCheckBox implements Option {
   @Override
   public void applySetting(@NotNull Settings setting) {
     setting.putData(this.key, this.isSelected());
-  }
-
-  @Nullable
-  @Override
-  public Integer getTopInset() {
-    return this.topInset;
   }
 }

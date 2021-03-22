@@ -11,8 +11,9 @@
 package com.zuminX.window;
 
 import com.intellij.util.ui.FormBuilder;
-import com.zuminX.beans.settings.SettingItem;
-import com.zuminX.beans.settings.Settings;
+import com.zuminX.settings.SettingItem;
+import com.zuminX.settings.Settings;
+import com.zuminX.window.tabs.SwaggerAnnotationTabbedPane;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
@@ -32,15 +33,10 @@ public class SwaggerSettingWindow {
     FormBuilder builder = FormBuilder.createFormBuilder();
 
     List<SettingItem> allSettingItems = Settings.getAllSettingItems();
-    for (int i = 0; i < allSettingItems.size(); i++) {
-      SettingItem item = allSettingItems.get(i);
-      if (i == 0) {
-        builder.addComponent(item.getForm().getContent());
-      } else {
-        builder.addComponent(item.getForm().getContent(), VERTICAL_CLEARANCE);
-      }
+    allSettingItems.forEach(item -> {
+      builder.addComponent(item.getForm().getContent(), VERTICAL_CLEARANCE);
       optionList.addAll(item.getOptions());
-    }
+    });
 
     content = builder.addComponentFillVertically(new JPanel(), VERTICAL_CLEARANCE).getPanel();
   }
