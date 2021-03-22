@@ -10,9 +10,8 @@
  */
 package com.zuminX.settings;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.convert.ConverterRegistry;
-import com.zuminX.convert.AnnotationItemMapConvert;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zuminX.utils.CoreUtils;
 import com.zuminX.window.Option;
 import com.zuminX.window.OptionForm;
@@ -85,11 +84,15 @@ public class Settings {
     if (value == null) {
       return defaultValue;
     }
-    return Convert.convert(defaultValue.getClass(), value, defaultValue);
+    return (T) new ObjectMapper().readValue(value, defaultValue.getClass());
   }
 
-  public <T> void putData(@NotNull SettingKey<T> key, @NotNull Object value) {
-    this.properties.put(key.getName(), value.toString());
+  public <T> void putData(@NotNull Key<T> key, @NotNull Object value) {
+    try {
+      this.properties.put(key.getName(), new ObjectMapper().writeValueAsString(value));
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
   }
 
   public boolean isModified(Settings changedSetting) {
@@ -102,8 +105,7 @@ public class Settings {
   }
 
   public void initValue() {
-    //TODO toString()会导致无法正常序列化
-    Key.getAllKeys().values().forEach(key -> this.properties.put(key.getName(), key.getDefaultData().toString()));
+    Key.getAllKeys().values().forEach(key -> putData(key, key.getDefaultData()));
   }
 
 }

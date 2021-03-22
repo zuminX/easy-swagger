@@ -13,8 +13,6 @@
 
     <applicationService serviceImplementation="com.zuminX.config.SwaggerSetting"/>
 
-    <applicationInitializedListener implementation="com.zuminX.config.GlobalConvertConfig" id="GlobalConvertConfig" />
-
     <applicationConfigurable parentId="tools" instance="com.zuminX.config.SwaggerSettingConfig" id="SwaggerSettingConfig"
       dynamic="true"/>
   </extensions>

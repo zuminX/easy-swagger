@@ -1,6 +1,5 @@
 package com.zuminX.window.tabs;
 
-import cn.hutool.json.JSONUtil;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBTabbedPane;
 import com.zuminX.annotations.AnnotationItem;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import javax.swing.JPanel;
 import org.jetbrains.annotations.NotNull;
@@ -67,6 +65,6 @@ public class SwaggerAnnotationTabbedPane extends JBTabbedPane implements Option 
   public void applySetting(@NotNull Settings setting) {
     Map<String, List<AnnotationItem>> map = new HashMap<>();
     table.forEach((key, value) -> map.put(key, value.getItemList()));
-    setting.putData(settingKey, JSONUtil.parseObj(new AnnotationItemMap(map)).toString());
+    setting.putData(settingKey, new AnnotationItemMap(map));
   }
 }

@@ -59,13 +59,7 @@ public class ComboBoxTemplate<T> extends JPanel implements Option {
 
   @Nullable
   public final T getSelectItem() {
-    Object selectedItem = comboBox.getSelectedItem();
-    try {
-      //noinspection unchecked
-      return (T) selectedItem;
-    } catch (Exception ignore) {
-    }
-    return null;
+    return (T) comboBox.getSelectedItem();
   }
 
   public final void setSelectItem(@NotNull T item) {

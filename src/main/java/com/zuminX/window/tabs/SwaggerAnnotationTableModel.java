@@ -16,7 +16,7 @@ public class SwaggerAnnotationTableModel extends AbstractTableModel {
   @Setter
   private List<AnnotationItem> annotationItems;
 
-  private final List<String> columnName = Arrays.asList("注解名", "默认值", "是否开启");
+  private final List<String> columnName = Arrays.asList("AnnotationName", "Defaults", "Whether to generate");
 
   public SwaggerAnnotationTableModel(List<AnnotationItem> annotationItems) {
     this.annotationItems = annotationItems;

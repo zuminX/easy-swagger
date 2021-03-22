@@ -23,24 +23,24 @@ public class NumberInputTemplate extends BaseInputTemplate<Number> {
 
   private boolean withDouble = false;
 
-  public NumberInputTemplate(@Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<Number> verify, boolean withDouble) {
+  public NumberInputTemplate(@Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<String> verify, boolean withDouble) {
     super(defaultValue, key, verify, false);
     this.withDouble = withDouble;
     initVerify();
   }
 
-  public NumberInputTemplate(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<Number> verify, boolean withDouble) {
+  public NumberInputTemplate(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<String> verify, boolean withDouble) {
     super(label, defaultValue, key, verify, false);
     this.withDouble = withDouble;
     initVerify();
   }
 
-  public NumberInputTemplate(@Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<Number> verify) {
+  public NumberInputTemplate(@Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<String> verify) {
     super(defaultValue, key, verify, false);
     initVerify();
   }
 
-  public NumberInputTemplate(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<Number> verify) {
+  public NumberInputTemplate(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<String> verify) {
     super(label, defaultValue, key, verify, false);
     initVerify();
   }

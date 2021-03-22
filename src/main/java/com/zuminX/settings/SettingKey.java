@@ -66,7 +66,7 @@ public class SettingKey<T> extends Key<T> {
 
   @NotNull
   public static SettingKey<Number> createInputNumber(@NotNull String name, @NotNull Integer defaultData,
-      @NotNull Matcher<Number> verify) {
+      @NotNull Matcher<String> verify) {
     SettingKey<Number> settingKey = new SettingKey<>(name, defaultData);
     settingKey.option = new NumberInputTemplate(defaultData, settingKey, verify);
     return settingKey;
