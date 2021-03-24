@@ -5,6 +5,8 @@ import cn.hutool.core.util.TypeUtil;
 import com.zuminX.names.ClassName;
 import com.zuminX.utils.PublicUtils;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
@@ -37,40 +39,36 @@ public abstract class AnnotationStr {
    * @return 注解字符串
    */
   public <T extends AnnotationStr> String toStr() {
-    return toStr(this.getClass(), this);
+    return toStr(this);
   }
 
   /**
    * 递归获取注解字符串
    *
-   * @param clazz         父类或超类是注解字符串类的Class对象
    * @param annotationStr 注解字符串对象
    * @return 注解字符串
    */
   @SneakyThrows
   @SuppressWarnings("unchecked")
-  private <T extends AnnotationStr> String toStr(Class<T> clazz, AnnotationStr annotationStr) {
-    List<Field> fields = PublicUtils.getNotStaticField(clazz);
-    if (fields.isEmpty()) {
+  private <T extends AnnotationStr> String toStr(AnnotationStr annotationStr) {
+    List<AnnotationItem<?>> annotationItems = getSortItem(annotationStr);
+    if (annotationItems.isEmpty()) {
       return annotationStr.empty();
     }
     StringBuilder sb = new StringBuilder(annotationStr.empty());
     sb.append("(");
-    for (Field field : fields) {
-      field.setAccessible(true);
-      Object value = field.get(annotationStr);
-      if (value == null) {
-        continue;
-      }
-      String name = field.getName();
+    for (AnnotationItem<?> item : annotationItems) {
+      Object value = item.getData();
       String content;
-      if (PublicUtils.isNumOrBool(value)) {
+      if (value == null) {
+        content = item.getDefaultText();
+      } else if (PublicUtils.isNumOrBool(value)) {
         content = value.toString();
       } else if (value instanceof List) {
-        Class<?> valueClass = (Class<?>) TypeUtil.getTypeArgument(field.getGenericType());
+        Class<?> valueClass = (Class<?>) TypeUtil.getTypeArgument(item.getType());
         if (AnnotationStr.class.isAssignableFrom(valueClass)) {
           String childContent = ((List<AnnotationStr>) value).stream()
-              .map(annotation -> toStr((Class<? extends AnnotationStr>) valueClass, annotation))
+              .map(this::toStr)
               .collect(Collectors.joining(",\n", "\n", ""));
           sb.append(PublicUtils.wrapInCurlyBraces(childContent));
           continue;
@@ -82,10 +80,29 @@ public abstract class AnnotationStr {
       } else {
         content = PublicUtils.wrapInDoubleQuotes(value);
       }
-      sb.append(name).append(" = ").append(content).append(", ");
+      sb.append(item.getName()).append(" = ").append(content).append(", ");
     }
     return StrUtil.removeSuffix(sb, ", ") + ")";
   }
 
+
+  @SneakyThrows
+  private List<AnnotationItem<?>> getSortItem(AnnotationStr annotationStr) {
+    List<AnnotationItem<?>> itemList = new ArrayList<>();
+    for (Field field : annotationStr.getClass().getDeclaredFields()) {
+      if (!AnnotationItem.class.isAssignableFrom(field.getType())) {
+        continue;
+      }
+      field.setAccessible(true);
+      AnnotationItem<?> value = (AnnotationItem<?>) field.get(annotationStr);
+      if (value == null || !value.getShow()) {
+        continue;
+      }
+      value.setType(TypeUtil.getTypeArgument(TypeUtil.getType(field)));
+      itemList.add(value);
+    }
+    itemList.sort(Comparator.comparingInt(AnnotationItem::getSort));
+    return itemList;
+  }
 
 }

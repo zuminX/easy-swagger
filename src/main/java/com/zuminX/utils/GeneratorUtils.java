@@ -29,18 +29,19 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.zuminX.annotations.AnnotationStr;
-import com.zuminX.annotations.swagger.ApiAnnotation;
-import com.zuminX.annotations.swagger.ApiImplicitParamAnnotation;
-import com.zuminX.annotations.swagger.ApiImplicitParamsAnnotation;
-import com.zuminX.annotations.swagger.ApiModelAnnotation;
-import com.zuminX.annotations.swagger.ApiModelPropertyAnnotation;
-import com.zuminX.annotations.swagger.ApiOperationAnnotation;
+import com.zuminX.annotations.swagger.Api;
+import com.zuminX.annotations.swagger.ApiImplicitParam;
+import com.zuminX.annotations.swagger.ApiImplicitParams;
+import com.zuminX.annotations.swagger.ApiModel;
+import com.zuminX.annotations.swagger.ApiModelProperty;
+import com.zuminX.annotations.swagger.ApiOperation;
 import com.zuminX.names.ClassName;
 import com.zuminX.names.ControllerAnnotation;
 import com.zuminX.names.MappingAnnotation;
 import com.zuminX.names.RequestAnnotation;
 import com.zuminX.names.SwaggerAnnotation;
 import com.zuminX.service.Notify;
+import com.zuminX.window.form.SwaggerAnnotationForm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -62,6 +63,10 @@ public class GeneratorUtils {
     this.psiFile = psiFile;
     this.psiClass = PsiTreeUtil.findChildOfAnyType(psiFile, PsiClass.class);
     this.elementFactory = JavaPsiFacade.getElementFactory(project);
+  }
+
+  private static <T extends AnnotationStr> T getSettingsAnnotation(Class<T> clazz) {
+    return SwaggerAnnotationForm.getSettingsData().getAnnotationInstance(clazz);
   }
 
   /**
@@ -242,7 +247,12 @@ public class GeneratorUtils {
     String value = getValueOfRequestMapping(psiClass);
     String comment = getFirstComment(psiClass);
     List<String> tags = comment == null ? null : Collections.singletonList(comment);
-    doWrite(ApiAnnotation.builder().value(value).tags(tags).build(), psiClass);
+
+    Api api = getSettingsAnnotation(Api.class);
+    api.getValue().setData(value);
+    api.getTags().setData(tags);
+
+    doWrite(api, psiClass);
   }
 
   /**
@@ -251,7 +261,10 @@ public class GeneratorUtils {
    * @param psiClass Psi类
    */
   private void generateDomainClassAnnotation(PsiClass psiClass) {
-    doWrite(ApiModelAnnotation.builder().description(getFirstComment(psiClass)).build(), psiClass);
+    ApiModel apiModel = getSettingsAnnotation(ApiModel.class);
+    apiModel.getDescription().setData(getFirstComment(psiClass));
+
+    doWrite(apiModel, psiClass);
   }
 
   /**
@@ -275,8 +288,13 @@ public class GeneratorUtils {
     String value = Convert.toStr(getTextOfAnnotationMemberValue(apiOperationExist, "value"), "");
     String notes = getTextOfAnnotationMemberValue(apiOperationExist, "notes");
     String httpMethod = getMethodOfRequestMapping(psiMethod);
-    AnnotationStr annotationStr = ApiOperationAnnotation.builder().value(value).notes(notes).httpMethod(httpMethod).build();
-    doWrite(annotationStr, psiMethod);
+
+    ApiOperation apiOperation = getSettingsAnnotation(ApiOperation.class);
+    apiOperation.getValue().setData(value);
+    apiOperation.getNotes().setData(notes);
+    apiOperation.getHttpMethod().setData(httpMethod);
+
+    doWrite(apiOperation, psiMethod);
   }
 
   /**
@@ -289,7 +307,7 @@ public class GeneratorUtils {
     if (ArrayUtil.isEmpty(psiParameters)) {
       return;
     }
-    List<ApiImplicitParamAnnotation> apiImplicitParamList = new ArrayList<>(psiParameters.length);
+    List<ApiImplicitParam> apiImplicitParamList = new ArrayList<>(psiParameters.length);
     Arrays.stream(psiParameters).forEach(psiParameter -> {
       String dataType = PublicUtils.getSimpleNameByQualifiedName(psiParameter.getType().getCanonicalText());
       String paramType = Arrays.stream(psiParameter.getModifierList().getAnnotations())
@@ -299,14 +317,20 @@ public class GeneratorUtils {
           .findAny()
           .map(RequestAnnotation::getType)
           .orElse(null);
-      apiImplicitParamList.add(ApiImplicitParamAnnotation.builder()
-          .paramType(paramType)
-          .dataType(dataType)
-          .name(psiParameter.getNameIdentifier().getText())
-          .value("")
-          .build());
+
+      ApiImplicitParam apiImplicitParam = getSettingsAnnotation(ApiImplicitParam.class);
+      apiImplicitParam.getParamType().setData(paramType);
+      apiImplicitParam.getDataType().setData(dataType);
+      apiImplicitParam.getName().setData(psiParameter.getNameIdentifier().getText());
+      apiImplicitParam.getValue().setData("");
+
+      apiImplicitParamList.add(apiImplicitParam);
     });
-    doWrite(ApiImplicitParamsAnnotation.builder().value(apiImplicitParamList).build(), psiMethod);
+
+    ApiImplicitParams apiImplicitParams = getSettingsAnnotation(ApiImplicitParams.class);
+    apiImplicitParams.getValue().setData(apiImplicitParamList);
+
+    doWrite(apiImplicitParams, psiMethod);
   }
 
   /**
@@ -315,7 +339,10 @@ public class GeneratorUtils {
    * @param psiField Psi字段
    */
   private void generateFieldAnnotation(PsiField psiField) {
-    doWrite(ApiModelPropertyAnnotation.builder().value(getFirstComment(psiField)).build(), psiField);
+    ApiModelProperty apiModelProperty = getSettingsAnnotation(ApiModelProperty.class);
+    apiModelProperty.getValue().setData(getFirstComment(psiField));
+
+    doWrite(apiModelProperty, psiField);
   }
 
   /**

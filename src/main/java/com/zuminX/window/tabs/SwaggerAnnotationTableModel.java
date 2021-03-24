@@ -14,17 +14,17 @@ public class SwaggerAnnotationTableModel extends AbstractTableModel {
 
   @Getter
   @Setter
-  private List<AnnotationItem> annotationItems;
+  private List<AnnotationItem<?>> annotationNameItems;
 
   private final List<String> columnName = Arrays.asList("AnnotationName", "Defaults", "Whether to generate");
 
-  public SwaggerAnnotationTableModel(List<AnnotationItem> annotationItems) {
-    this.annotationItems = annotationItems;
+  public SwaggerAnnotationTableModel(List<AnnotationItem<?>> annotationNameItems) {
+    this.annotationNameItems = annotationNameItems;
   }
 
   @Override
   public int getRowCount() {
-    return annotationItems.size();
+    return annotationNameItems.size();
   }
 
   @Override
@@ -66,12 +66,12 @@ public class SwaggerAnnotationTableModel extends AbstractTableModel {
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
-    AnnotationItem item = annotationItems.get(rowIndex);
+    AnnotationItem<?> item = annotationNameItems.get(rowIndex);
     switch (columnIndex) {
       case 0:
         return item.getName();
       case 1:
-        return item.getDefaultValue();
+        return item.getDefaultText();
       case 2:
         return item.getShow();
       default:
@@ -81,13 +81,13 @@ public class SwaggerAnnotationTableModel extends AbstractTableModel {
 
   @Override
   public void setValueAt(Object value, int rowIndex, int columnIndex) {
-    AnnotationItem item = annotationItems.get(rowIndex);
+    AnnotationItem<?> item = annotationNameItems.get(rowIndex);
     switch (columnIndex) {
       case 0:
         item.setName(value.toString());
         return;
       case 1:
-        item.setDefaultValue(value.toString());
+        item.setDefaultText(value.toString());
         return;
       case 2:
         item.setShow((Boolean) value);

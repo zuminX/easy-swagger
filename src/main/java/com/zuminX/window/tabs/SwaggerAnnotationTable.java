@@ -17,12 +17,12 @@ public class SwaggerAnnotationTable extends JBTable {
     setTableToCentered();
   }
 
-  public List<AnnotationItem> getItemList() {
-    return tableModel.getAnnotationItems();
+  public List<AnnotationItem<?>> getItemList() {
+    return tableModel.getAnnotationNameItems();
   }
 
-  public void setItemList(List<AnnotationItem> itemList) {
-    tableModel.setAnnotationItems(itemList);
+  public void setItemList(List<AnnotationItem<?>> itemList) {
+    tableModel.setAnnotationNameItems(itemList);
   }
 
   public void moveUp() {
