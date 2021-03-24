@@ -4,22 +4,19 @@ plugins {
 }
 
 group 'com.github.zuminX'
-version '1.0-SNAPSHOT'
+version '1.0.0'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-
     compileOnly 'org.projectlombok:lombok:1.18.4'
     annotationProcessor 'org.projectlombok:lombok:1.18.4'
     testCompileOnly 'org.projectlombok:lombok:1.18.4'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.4'
 
-    compile 'cn.hutool:hutool-core:5.5.9'
+    implementation 'cn.hutool:hutool-core:5.5.9'
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/

@@ -391,7 +391,7 @@ public class GeneratorUtils {
       return null;
     }
     if (psiFields.size() > 1) {
-      Notify.getInstance(project).warning("@ApiOperation中的httpMethod属性无法支持多个请求类型");
+      Notify.getInstance(project).warning("The httpMethod attribute in @ApiOperation cannot support multiple request types");
     }
     return psiFields.get(0).getName();
   }

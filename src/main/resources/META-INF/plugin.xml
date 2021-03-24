@@ -1,9 +1,21 @@
 <idea-plugin>
   <id>com.github.zuminX.easy-swagger</id>
-  <name>zuminX</name>
-  <vendor email="1215287120@qq.com" url="http://www.github.com/zuminX">GitHub</vendor>
+  <name>EasySwagger</name>
+  <vendor email="1215287120@qq.com" url="https://github.com/zuminX/easy-swagger">zuminX</vendor>
 
-  <description>TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST</description>
+  <description><![CDATA[
+        Swagger Annotation Generation Tool<br>
+        1.If the current class is marked with @RestController or @Controller annotation, the Controller annotation is generated. Otherwise, the Model annotation is generated;<br>
+        2.You can select a class name, field name or method name to generate the specified annotation;<br>
+        3.The ability to set whether to generate specified annotations and default values via the Settings-Tools-Easy Swagger page.<br>
+      <br>
+      Swagger注解生成工具<br>
+        1.若当前类标注了@RestController或@Controller注解，则生成Controller注解。否则生成Model注解；<br>
+        2.可选择类名、字段名或方法名生成指定的注解；<br>
+        3.能通过Settings-Tools-Easy Swagger页中设置是否生成指定注解和默认值。<br>
+    ]]></description>
+
+  <idea-version since-build="201.8743"/>
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.java</depends>
