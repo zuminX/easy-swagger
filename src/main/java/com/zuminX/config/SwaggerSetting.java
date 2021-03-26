@@ -1,13 +1,3 @@
-/*
-  Copyright (C), 2018-2020, ZhangYuanSheng
-  FileName: AppSettingsState
-  Author:   ZhangYuanSheng
-  Date:     2020/5/27 18:08
-  Description: 
-  History:
-  <author>          <time>          <version>          <desc>
-  作者姓名            修改时间           版本号              描述
- */
 package com.zuminX.config;
 
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -16,6 +6,11 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.zuminX.settings.Settings;
+import com.zuminX.window.form.SwaggerAnnotationForm;
+import com.zuminX.window.tabs.domain.AnnotationItem;
+import com.zuminX.window.tabs.domain.AnnotationSettings;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

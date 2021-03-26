@@ -9,12 +9,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
 import com.zuminX.utils.GeneratorUtils;
+import com.zuminX.window.form.SwaggerAnnotationForm;
+import com.zuminX.window.tabs.domain.AnnotationSettings;
 
 public class GeneratorSwaggerAction extends AnAction {
 
   @Override
   public void actionPerformed(AnActionEvent anActionEvent) {
-    // 获取当前的project对象
     Project project = anActionEvent.getProject();
     // 获取当前文件对象
     Editor editor = anActionEvent.getData(PlatformDataKeys.EDITOR);
@@ -22,8 +23,10 @@ public class GeneratorSwaggerAction extends AnAction {
     assert project != null;
 
     PsiFile psiFile = PsiUtilBase.getPsiFileInEditor(editor, project);
-
     String selectionText = editor.getSelectionModel().getSelectedText();
+
+    SwaggerAnnotationForm.loadSettingsData();
+
     GeneratorUtils generatorUtils = new GeneratorUtils(project, psiFile);
     if (StrUtil.isBlank(selectionText)) {
       generatorUtils.generate();

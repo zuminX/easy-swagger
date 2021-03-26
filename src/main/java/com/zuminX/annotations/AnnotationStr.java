@@ -1,13 +1,15 @@
 package com.zuminX.annotations;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import com.zuminX.names.ClassName;
 import com.zuminX.utils.PublicUtils;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 
@@ -15,6 +17,7 @@ import lombok.SneakyThrows;
  * 注解字符串
  */
 public abstract class AnnotationStr {
+
 
   /**
    * 获取该注解的类名对象
@@ -42,6 +45,21 @@ public abstract class AnnotationStr {
     return toStr(this);
   }
 
+  public static AnnotationAttr getAnnotationAttr(Field field) {
+    return AnnotationUtil.getAnnotation(field, AnnotationAttr.class);
+  }
+
+  public static List<Field> getSortFields(AnnotationStr annotationStr) {
+    return getSortFields(annotationStr, null);
+  }
+
+  public static List<Field> getSortFields(AnnotationStr annotationStr, Predicate<AnnotationAttr> predicate) {
+    return Arrays.stream(annotationStr.getClass().getDeclaredFields()).filter(field -> {
+      AnnotationAttr annotationAttr = getAnnotationAttr(field);
+      return annotationAttr != null && (predicate == null || predicate.test(annotationAttr));
+    }).sorted(Comparator.comparingInt(f -> getAnnotationAttr(f).sort())).collect(Collectors.toList());
+  }
+
   /**
    * 递归获取注解字符串
    *
@@ -51,21 +69,23 @@ public abstract class AnnotationStr {
   @SneakyThrows
   @SuppressWarnings("unchecked")
   private <T extends AnnotationStr> String toStr(AnnotationStr annotationStr) {
-    List<AnnotationItem<?>> annotationItems = getSortItem(annotationStr);
-    if (annotationItems.isEmpty()) {
+    List<Field> fields = getSortAndShowFields(annotationStr);
+    if (fields.isEmpty()) {
       return annotationStr.empty();
     }
     StringBuilder sb = new StringBuilder(annotationStr.empty());
     sb.append("(");
-    for (AnnotationItem<?> item : annotationItems) {
-      Object value = item.getData();
+    for (Field field : fields) {
+      field.setAccessible(true);
+      Object value = field.get(annotationStr);
+      AnnotationAttr annotationAttr = getAnnotationAttr(field);
       String content;
       if (value == null) {
-        content = item.getDefaultText();
+        content = annotationAttr.defaultText();
       } else if (PublicUtils.isNumOrBool(value)) {
         content = value.toString();
       } else if (value instanceof List) {
-        Class<?> valueClass = (Class<?>) TypeUtil.getTypeArgument(item.getType());
+        Class<?> valueClass = (Class<?>) TypeUtil.getTypeArgument(field.getGenericType());
         if (AnnotationStr.class.isAssignableFrom(valueClass)) {
           String childContent = ((List<AnnotationStr>) value).stream()
               .map(this::toStr)
@@ -80,29 +100,13 @@ public abstract class AnnotationStr {
       } else {
         content = PublicUtils.wrapInDoubleQuotes(value);
       }
-      sb.append(item.getName()).append(" = ").append(content).append(", ");
+      sb.append(field.getName()).append(" = ").append(content).append(", ");
     }
     return StrUtil.removeSuffix(sb, ", ") + ")";
   }
 
-
-  @SneakyThrows
-  private List<AnnotationItem<?>> getSortItem(AnnotationStr annotationStr) {
-    List<AnnotationItem<?>> itemList = new ArrayList<>();
-    for (Field field : annotationStr.getClass().getDeclaredFields()) {
-      if (!AnnotationItem.class.isAssignableFrom(field.getType())) {
-        continue;
-      }
-      field.setAccessible(true);
-      AnnotationItem<?> value = (AnnotationItem<?>) field.get(annotationStr);
-      if (value == null || !value.getShow()) {
-        continue;
-      }
-      value.setType(TypeUtil.getTypeArgument(TypeUtil.getType(field)));
-      itemList.add(value);
-    }
-    itemList.sort(Comparator.comparingInt(AnnotationItem::getSort));
-    return itemList;
+  private static List<Field> getSortAndShowFields(AnnotationStr annotationStr) {
+    return getSortFields(annotationStr, AnnotationAttr::show);
   }
 
 }

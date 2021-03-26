@@ -1,6 +1,6 @@
 package com.zuminX.window.tabs;
 
-import com.zuminX.annotations.AnnotationItem;
+import com.zuminX.window.tabs.domain.AnnotationItem;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -14,11 +14,11 @@ public class SwaggerAnnotationTableModel extends AbstractTableModel {
 
   @Getter
   @Setter
-  private List<AnnotationItem<?>> annotationNameItems;
+  private List<AnnotationItem> annotationNameItems;
 
   private final List<String> columnName = Arrays.asList("AnnotationName", "Defaults", "Whether to generate");
 
-  public SwaggerAnnotationTableModel(List<AnnotationItem<?>> annotationNameItems) {
+  public SwaggerAnnotationTableModel(List<AnnotationItem> annotationNameItems) {
     this.annotationNameItems = annotationNameItems;
   }
 
@@ -66,7 +66,7 @@ public class SwaggerAnnotationTableModel extends AbstractTableModel {
 
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
-    AnnotationItem<?> item = annotationNameItems.get(rowIndex);
+    AnnotationItem item = annotationNameItems.get(rowIndex);
     switch (columnIndex) {
       case 0:
         return item.getName();
@@ -81,7 +81,7 @@ public class SwaggerAnnotationTableModel extends AbstractTableModel {
 
   @Override
   public void setValueAt(Object value, int rowIndex, int columnIndex) {
-    AnnotationItem<?> item = annotationNameItems.get(rowIndex);
+    AnnotationItem item = annotationNameItems.get(rowIndex);
     switch (columnIndex) {
       case 0:
         item.setName(value.toString());

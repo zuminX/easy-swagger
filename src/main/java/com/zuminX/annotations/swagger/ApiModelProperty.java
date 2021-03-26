@@ -1,58 +1,57 @@
 package com.zuminX.annotations.swagger;
 
-import com.zuminX.annotations.AnnotationItem;
+import com.zuminX.annotations.AnnotationAttr;
 import com.zuminX.annotations.AnnotationStr;
 import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ApiModelProperty extends AnnotationStr {
 
-  private AnnotationItem<String> value;
+  @AnnotationAttr(show = true)
+  private String value;
 
-  private AnnotationItem<String> name;
+  @AnnotationAttr(show = true)
+  private String name;
 
-  private AnnotationItem<String> allowableValues;
+  @AnnotationAttr
+  private String allowableValues;
 
-  private AnnotationItem<String> access;
+  @AnnotationAttr
+  private String access;
 
-  private AnnotationItem<String> notes;
+  @AnnotationAttr
+  private String notes;
 
-  private AnnotationItem<String> dataType;
+  @AnnotationAttr
+  private String dataType;
 
-  private AnnotationItem<Boolean> required;
+  @AnnotationAttr(show = true)
+  private Boolean required;
 
-  private AnnotationItem<Integer> position;
+  @AnnotationAttr
+  private Integer position;
 
-  private AnnotationItem<Boolean> hidden;
+  @AnnotationAttr
+  private Boolean hidden;
 
-  private AnnotationItem<String> example;
+  @AnnotationAttr
+  private String example;
 
-  private AnnotationItem<String> reference;
+  @AnnotationAttr
+  private String reference;
 
-  private AnnotationItem<Boolean> allowEmptyValue;
-
-  public static AnnotationStr getDefaultInstance() {
-    ApiModelProperty apiModelAnnotation = new ApiModelProperty();
-    apiModelAnnotation.setValue(new AnnotationItem<>("value", true));
-    apiModelAnnotation.setName(new AnnotationItem<>("name", true));
-    apiModelAnnotation.setAllowableValues(new AnnotationItem<>("allowableValues"));
-    apiModelAnnotation.setAccess(new AnnotationItem<>("access"));
-    apiModelAnnotation.setNotes(new AnnotationItem<>("notes"));
-    apiModelAnnotation.setDataType(new AnnotationItem<>("dataType"));
-    apiModelAnnotation.setRequired(new AnnotationItem<>("required", true));
-    apiModelAnnotation.setPosition(new AnnotationItem<>("position"));
-    apiModelAnnotation.setHidden(new AnnotationItem<>("hidden"));
-    apiModelAnnotation.setExample(new AnnotationItem<>("example"));
-    apiModelAnnotation.setReference(new AnnotationItem<>("reference"));
-    apiModelAnnotation.setAllowEmptyValue(new AnnotationItem<>("allowEmptyValue"));
-    return apiModelAnnotation;
-  }
+  @AnnotationAttr
+  private Boolean allowEmptyValue;
 
   @Override
   public ClassName getClassName() {

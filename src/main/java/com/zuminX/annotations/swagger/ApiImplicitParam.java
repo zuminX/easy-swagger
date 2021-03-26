@@ -1,70 +1,69 @@
 package com.zuminX.annotations.swagger;
 
-import com.zuminX.annotations.AnnotationItem;
+import com.zuminX.annotations.AnnotationAttr;
 import com.zuminX.annotations.AnnotationStr;
 import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ApiImplicitParam extends AnnotationStr {
 
-  private AnnotationItem<String> name;
+  @AnnotationAttr(show = true)
+  private String name;
 
-  private AnnotationItem<String> value;
+  @AnnotationAttr
+  private String value;
 
-  private AnnotationItem<String> defaultValue;
+  @AnnotationAttr(show = true)
+  private String defaultValue;
 
-  private AnnotationItem<String> allowableValues;
+  @AnnotationAttr(show = true)
+  private String allowableValues;
 
-  private AnnotationItem<Boolean> required;
+  @AnnotationAttr
+  private Boolean required;
 
-  private AnnotationItem<String> access;
+  @AnnotationAttr
+  private String access;
 
-  private AnnotationItem<Boolean> allowMultiple;
+  @AnnotationAttr
+  private Boolean allowMultiple;
 
-  private AnnotationItem<String> dataType;
+  @AnnotationAttr
+  private String dataType;
 
-  private AnnotationItem<Class<?>> dataTypeClass;
+  @AnnotationAttr(show = true)
+  private Class<?> dataTypeClass;
 
-  private AnnotationItem<String> paramType;
+  @AnnotationAttr
+  private String paramType;
 
-  private AnnotationItem<String> example;
+  @AnnotationAttr
+  private String example;
 
-  private AnnotationItem<String> type;
+  @AnnotationAttr
+  private String type;
 
-  private AnnotationItem<String> format;
+  @AnnotationAttr
+  private String format;
 
-  private AnnotationItem<Boolean> allowEmptyValue;
+  @AnnotationAttr
+  private Boolean allowEmptyValue;
 
-  private AnnotationItem<Boolean> readOnly;
+  @AnnotationAttr
+  private Boolean readOnly;
 
-  private AnnotationItem<String> collectionFormat;
-
-  public static AnnotationStr getDefaultInstance() {
-    ApiImplicitParam apiImplicitParam = new ApiImplicitParam();
-    apiImplicitParam.setName(new AnnotationItem<>("name", true));
-    apiImplicitParam.setValue(new AnnotationItem<>("value", true));
-    apiImplicitParam.setDefaultValue(new AnnotationItem<>("defaultValue", true));
-    apiImplicitParam.setAllowableValues(new AnnotationItem<>("allowableValues", true));
-    apiImplicitParam.setRequired(new AnnotationItem<>("required", true));
-    apiImplicitParam.setAccess(new AnnotationItem<>("access"));
-    apiImplicitParam.setAllowMultiple(new AnnotationItem<>("allowMultiple"));
-    apiImplicitParam.setDataType(new AnnotationItem<>("dataType"));
-    apiImplicitParam.setDataTypeClass(new AnnotationItem<>("dataTypeClass", true));
-    apiImplicitParam.setParamType(new AnnotationItem<>("paramType"));
-    apiImplicitParam.setExample(new AnnotationItem<>("example"));
-    apiImplicitParam.setType(new AnnotationItem<>("type"));
-    apiImplicitParam.setFormat(new AnnotationItem<>("format"));
-    apiImplicitParam.setAllowEmptyValue(new AnnotationItem<>("allowEmptyValue"));
-    apiImplicitParam.setReadOnly(new AnnotationItem<>("readOnly"));
-    apiImplicitParam.setCollectionFormat(new AnnotationItem<>("collectionFormat"));
-    return apiImplicitParam;
-  }
+  @AnnotationAttr
+  private String collectionFormat;
 
   @Override
   public ClassName getClassName() {

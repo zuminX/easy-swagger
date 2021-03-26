@@ -48,11 +48,12 @@ public class Settings {
     for (Class<?> declaredClass : CoreUtils.getClasses(OptionForm.class)) {
       OptionForm instance = (OptionForm) declaredClass.getConstructor().newInstance();
       SettingItem item = new SettingItem(instance);
-      for (Field declaredField : declaredClass.getDeclaredFields()) {
-        if (!declaredField.getType().equals(SettingKey.class)) {
+      for (Field field : declaredClass.getDeclaredFields()) {
+        if (!field.getType().equals(SettingKey.class)) {
           continue;
         }
-        Object value = declaredField.get(null);
+        field.setAccessible(true);
+        Object value = field.get(null);
         if (!(value instanceof SettingKey)) {
           continue;
         }

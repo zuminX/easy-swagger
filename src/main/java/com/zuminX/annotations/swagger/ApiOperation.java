@@ -1,65 +1,64 @@
 package com.zuminX.annotations.swagger;
 
-import com.zuminX.annotations.AnnotationItem;
+import com.zuminX.annotations.AnnotationAttr;
 import com.zuminX.annotations.AnnotationStr;
 import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ApiOperation extends AnnotationStr {
 
-  private AnnotationItem<String> value;
+  @AnnotationAttr(show = true)
+  private String value;
 
-  private AnnotationItem<String> notes;
+  @AnnotationAttr(show = true)
+  private String notes;
 
-  private AnnotationItem<List<String>> tags;
+  @AnnotationAttr(show = true)
+  private List<String> tags;
 
-  private AnnotationItem<Class<?>> response;
+  @AnnotationAttr
+  private Class<?> response;
 
-  private AnnotationItem<String> responseContainer;
+  @AnnotationAttr
+  private String responseContainer;
 
-  private AnnotationItem<String> responseReference;
+  @AnnotationAttr
+  private String responseReference;
 
-  private AnnotationItem<String> httpMethod;
+  @AnnotationAttr(show = true)
+  private String httpMethod;
 
-  private AnnotationItem<String> nickname;
+  @AnnotationAttr
+  private String nickname;
 
-  private AnnotationItem<String> produces;
+  @AnnotationAttr
+  private String produces;
 
-  private AnnotationItem<String> consumes;
+  @AnnotationAttr
+  private String consumes;
 
-  private AnnotationItem<String> protocols;
+  @AnnotationAttr
+  private String protocols;
 
-  private AnnotationItem<Boolean> hidden;
+  @AnnotationAttr
+  private Boolean hidden;
 
-  private AnnotationItem<Integer> code;
+  @AnnotationAttr
+  private Integer code;
 
-  private AnnotationItem<Boolean> ignoreJsonView;
-
-  public static AnnotationStr getDefaultInstance() {
-    ApiOperation apiOperation = new ApiOperation();
-    apiOperation.setValue(new AnnotationItem<>("value", true));
-    apiOperation.setNotes(new AnnotationItem<>("notes", true));
-    apiOperation.setTags(new AnnotationItem<>("tags", true));
-    apiOperation.setResponse(new AnnotationItem<>("response"));
-    apiOperation.setResponseContainer(new AnnotationItem<>("responseContainer"));
-    apiOperation.setResponseReference(new AnnotationItem<>("responseReference"));
-    apiOperation.setHttpMethod(new AnnotationItem<>("httpMethod", true));
-    apiOperation.setNickname(new AnnotationItem<>("nickname"));
-    apiOperation.setProduces(new AnnotationItem<>("produces"));
-    apiOperation.setConsumes(new AnnotationItem<>("consumes"));
-    apiOperation.setProtocols(new AnnotationItem<>("protocols"));
-    apiOperation.setHidden(new AnnotationItem<>("hidden"));
-    apiOperation.setCode(new AnnotationItem<>("code"));
-    apiOperation.setIgnoreJsonView(new AnnotationItem<>("ignoreJsonView"));
-    return apiOperation;
-  }
+  @AnnotationAttr
+  private Boolean ignoreJsonView;
 
   @Override
   public ClassName getClassName() {

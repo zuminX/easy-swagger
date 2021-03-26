@@ -1,20 +1,41 @@
 package com.zuminX.window.form;
 
-import com.zuminX.annotations.AnnotationSettings;
+import cn.hutool.core.annotation.AnnotationUtil;
+import com.zuminX.annotations.AnnotationAttr;
+import com.zuminX.annotations.AnnotationStr;
+import com.zuminX.annotations.swagger.Api;
 import com.zuminX.settings.SettingKey;
 import com.zuminX.window.OptionForm;
 import com.zuminX.window.tabs.SwaggerAnnotationTabbedPane;
+import com.zuminX.window.tabs.domain.AnnotationItem;
+import com.zuminX.window.tabs.domain.AnnotationSettings;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import lombok.SneakyThrows;
 
 public class SwaggerAnnotationForm extends OptionForm {
 
-  public static final SettingKey<AnnotationSettings> ANNOTATION_SETTINGS = getSettingKey();
+  private static final SettingKey<AnnotationSettings> ANNOTATION_SETTINGS = getSettingKey();
 
   public SwaggerAnnotationForm() {
     super("Swagger Annotation", 0);
   }
 
-  public static AnnotationSettings getSettingsData() {
-    return ANNOTATION_SETTINGS.getData();
+  @SneakyThrows
+  public static void loadSettingsData() {
+    Map<String, List<AnnotationItem>> map = ANNOTATION_SETTINGS.getData().getMap();
+    for (Entry<String, List<AnnotationItem>> entry : map.entrySet()) {
+      Class<?> clazz = Class.forName(entry.getKey());
+      for (AnnotationItem annotationItem : entry.getValue()) {
+        Field field = clazz.getDeclaredField(annotationItem.getName());
+        AnnotationAttr annotation = AnnotationStr.getAnnotationAttr(field);
+        AnnotationUtil.setValue(annotation, "defaultText", annotationItem.getDefaultText());
+        AnnotationUtil.setValue(annotation, "sort", annotationItem.getSort());
+        AnnotationUtil.setValue(annotation, "show", annotationItem.getShow());
+      }
+    }
   }
 
   private static SettingKey<AnnotationSettings> getSettingKey() {

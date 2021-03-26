@@ -2,22 +2,19 @@ package com.zuminX.window.tabs;
 
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBTabbedPane;
-import com.zuminX.annotations.AnnotationItem;
-import com.zuminX.annotations.AnnotationSettings;
+import com.zuminX.annotations.AnnotationAttr;
 import com.zuminX.annotations.AnnotationStr;
 import com.zuminX.settings.SettingKey;
 import com.zuminX.settings.Settings;
 import com.zuminX.utils.CoreUtils;
+import com.zuminX.utils.PublicUtils;
 import com.zuminX.window.Option;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import com.zuminX.window.tabs.domain.AnnotationItem;
+import com.zuminX.window.tabs.domain.AnnotationSettings;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.swing.JPanel;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -41,17 +38,15 @@ public class SwaggerAnnotationTabbedPane extends JBTabbedPane implements Option 
       decorator.setMoveDownAction(button -> jbTable.moveDown());
       decorator.setMoveUpAction(button -> jbTable.moveUp());
       JPanel panel = decorator.createPanel();
-      this.addTab(key, panel);
+      this.addTab(PublicUtils.getSimpleNameByQualifiedName(key), panel);
     });
   }
 
   @SneakyThrows
   public static AnnotationSettings getDefaultItems() {
-    Map<String, List<AnnotationItem<?>>> map = new HashMap<>();
+    Map<String, List<AnnotationItem>> map = new HashMap<>();
     for (Class<?> clazz : CoreUtils.getClasses(AnnotationStr.class)) {
-      Method method = clazz.getDeclaredMethod("getDefaultInstance");
-      AnnotationStr defaultInstance = (AnnotationStr) method.invoke(null);
-      map.put(clazz.getSimpleName(), getAnnotationItemList(defaultInstance));
+      map.put(clazz.getName(), getAnnotationItemList((AnnotationStr) clazz.getConstructor().newInstance()));
     }
     return new AnnotationSettings(map);
   }
@@ -66,22 +61,17 @@ public class SwaggerAnnotationTabbedPane extends JBTabbedPane implements Option 
 
   @Override
   public void applySetting(@NotNull Settings setting) {
-    Map<String, List<AnnotationItem<?>>> map = new HashMap<>();
+    Map<String, List<AnnotationItem>> map = new HashMap<>();
     table.forEach((key, value) -> map.put(key, value.getItemList()));
     setting.putData(settingKey, new AnnotationSettings(map));
   }
 
-  @SneakyThrows
-  private static List<AnnotationItem<?>> getAnnotationItemList(AnnotationStr annotationStr) {
-    List<AnnotationItem<?>> itemList = new ArrayList<>();
-    for (Field field : annotationStr.getClass().getDeclaredFields()) {
-      if (!AnnotationItem.class.isAssignableFrom(field.getType())) {
-        continue;
-      }
-      field.setAccessible(true);
-      itemList.add((AnnotationItem<?>) field.get(annotationStr));
-    }
-    itemList.sort(Comparator.comparingInt(AnnotationItem::getSort));
+  private static List<AnnotationItem> getAnnotationItemList(AnnotationStr annotationStr) {
+    List<AnnotationItem> itemList = new ArrayList<>();
+    AnnotationStr.getSortFields(annotationStr).forEach(field -> {
+      AnnotationAttr annotationAttr = AnnotationStr.getAnnotationAttr(field);
+      itemList.add(new AnnotationItem(field.getName(), annotationAttr.defaultText(), annotationAttr.sort(), annotationAttr.show()));
+    });
     return itemList;
   }
 }

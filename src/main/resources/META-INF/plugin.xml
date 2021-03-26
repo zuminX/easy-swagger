@@ -14,6 +14,7 @@
         2.可选择类名、字段名或方法名生成指定的注解；<br>
         3.能通过Settings-Tools-Easy Swagger页中设置是否生成指定注解和默认值。<br>
     ]]></description>
+  <version>1.0.0</version>
 
   <idea-version since-build="201.8743"/>
 

@@ -1,7 +1,7 @@
 package com.zuminX.window.tabs;
 
 import com.intellij.ui.table.JBTable;
-import com.zuminX.annotations.AnnotationItem;
+import com.zuminX.window.tabs.domain.AnnotationItem;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JLabel;
@@ -17,11 +17,11 @@ public class SwaggerAnnotationTable extends JBTable {
     setTableToCentered();
   }
 
-  public List<AnnotationItem<?>> getItemList() {
+  public List<AnnotationItem> getItemList() {
     return tableModel.getAnnotationNameItems();
   }
 
-  public void setItemList(List<AnnotationItem<?>> itemList) {
+  public void setItemList(List<AnnotationItem> itemList) {
     tableModel.setAnnotationNameItems(itemList);
   }
 
