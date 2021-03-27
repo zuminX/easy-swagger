@@ -29,7 +29,9 @@
     <applicationConfigurable parentId="tools" instance="com.zuminX.config.SwaggerSettingConfig" id="SwaggerSettingConfig"
       dynamic="true"/>
 
-    <projectService serviceImplementation="com.zuminX.service.Notify" />
+    <applicationService serviceImplementation="com.zuminX.service.Information"/>
+
+    <projectService serviceImplementation="com.zuminX.service.Notify"/>
   </extensions>
 
   <actions>

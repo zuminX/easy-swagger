@@ -1,5 +1,6 @@
 package com.zuminX.window.tabs;
 
+import com.zuminX.service.Information;
 import com.zuminX.window.tabs.domain.AnnotationItem;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +17,10 @@ public class SwaggerAnnotationTableModel extends AbstractTableModel {
   @Setter
   private List<AnnotationItem> annotationNameItems;
 
-  private final List<String> columnName = Arrays.asList("AnnotationName", "Defaults", "Whether to generate");
+  private final List<String> columnName = Arrays.asList(
+      Information.message("settings.annotation.table.row.name"),
+      Information.message("settings.annotation.table.row.default"),
+      Information.message("settings.annotation.table.row.enable"));
 
   public SwaggerAnnotationTableModel(List<AnnotationItem> annotationNameItems) {
     this.annotationNameItems = annotationNameItems;

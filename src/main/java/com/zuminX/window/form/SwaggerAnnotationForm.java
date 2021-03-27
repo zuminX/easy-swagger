@@ -3,7 +3,7 @@ package com.zuminX.window.form;
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.zuminX.annotations.AnnotationAttr;
 import com.zuminX.annotations.AnnotationStr;
-import com.zuminX.annotations.swagger.Api;
+import com.zuminX.service.Information;
 import com.zuminX.settings.SettingKey;
 import com.zuminX.window.OptionForm;
 import com.zuminX.window.tabs.SwaggerAnnotationTabbedPane;
@@ -20,7 +20,7 @@ public class SwaggerAnnotationForm extends OptionForm {
   private static final SettingKey<AnnotationSettings> ANNOTATION_SETTINGS = getSettingKey();
 
   public SwaggerAnnotationForm() {
-    super("Swagger Annotation", 0);
+    super(Information.message("settings.annotation.form.title"), 0);
   }
 
   @SneakyThrows

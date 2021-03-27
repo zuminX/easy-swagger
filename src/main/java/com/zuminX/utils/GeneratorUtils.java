@@ -40,6 +40,7 @@ import com.zuminX.names.ControllerAnnotation;
 import com.zuminX.names.MappingAnnotation;
 import com.zuminX.names.RequestAnnotation;
 import com.zuminX.names.SwaggerAnnotation;
+import com.zuminX.service.Information;
 import com.zuminX.service.Notify;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +51,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * 生成Swagger注解的工具类
+ */
 public class GeneratorUtils {
 
   private final Project project;
@@ -119,7 +123,7 @@ public class GeneratorUtils {
    */
   private void generate(Runnable runnable) {
     if (unableToGenerate()) {
-      Notify.getInstance(project).error("无法生成Swagger注解");
+      Notify.getInstance(project).error(Information.message("generator.annotation.error.unableGenerate"));
       return;
     }
     WriteCommandAction.runWriteCommandAction(project, runnable);
@@ -368,7 +372,7 @@ public class GeneratorUtils {
       return null;
     }
     if (psiFields.size() > 1) {
-      Notify.getInstance(project).warning("The httpMethod attribute in @ApiOperation cannot support multiple request types");
+      Notify.getInstance(project).warning(Information.message("generator.annotation.warning.multipleMethod"));
     }
     return psiFields.get(0).getName();
   }
