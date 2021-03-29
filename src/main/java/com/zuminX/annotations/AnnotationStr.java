@@ -1,5 +1,8 @@
 package com.zuminX.annotations;
 
+import static com.zuminX.utils.PublicUtils.wrapInCurlyBraces;
+import static com.zuminX.utils.PublicUtils.wrapInDoubleQuotes;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
@@ -14,10 +17,9 @@ import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 
 /**
- * 注解字符串
+ * 注解字符串类
  */
 public abstract class AnnotationStr {
-
 
   /**
    * 获取该注解的类名对象
@@ -45,14 +47,33 @@ public abstract class AnnotationStr {
     return toStr(this);
   }
 
+  /**
+   * 获取指定字段上的AnnotationAttr注解
+   *
+   * @param field 字段
+   * @return AnnotationAttr注解
+   */
   public static AnnotationAttr getAnnotationAttr(Field field) {
     return AnnotationUtil.getAnnotation(field, AnnotationAttr.class);
   }
 
+  /**
+   * 获取AnnotationStr的子类对象的排序字段
+   *
+   * @param annotationStr 实现AnnotationStr的子类对象
+   * @return 排序后的字段列表
+   */
   public static List<Field> getSortFields(AnnotationStr annotationStr) {
     return getSortFields(annotationStr, null);
   }
 
+  /**
+   * 获取AnnotationStr的子类对象的排序字段，并使用predicate进行条件过滤
+   *
+   * @param annotationStr 实现AnnotationStr的子类对象
+   * @param predicate     条件过滤
+   * @return 排序后且符合过滤条件的字段列表
+   */
   public static List<Field> getSortFields(AnnotationStr annotationStr, Predicate<AnnotationAttr> predicate) {
     return Arrays.stream(annotationStr.getClass().getDeclaredFields()).filter(field -> {
       AnnotationAttr annotationAttr = getAnnotationAttr(field);
@@ -61,7 +82,17 @@ public abstract class AnnotationStr {
   }
 
   /**
-   * 递归获取注解字符串
+   * 获取AnnotationStr的子类对象的排序且显示的字段
+   *
+   * @param annotationStr 实现AnnotationStr的子类对象
+   * @return 排序后的显示字段列表
+   */
+  private static List<Field> getSortAndShowFields(AnnotationStr annotationStr) {
+    return getSortFields(annotationStr, AnnotationAttr::show);
+  }
+
+  /**
+   * 生成注解字符串
    *
    * @param annotationStr 注解字符串对象
    * @return 注解字符串
@@ -78,35 +109,47 @@ public abstract class AnnotationStr {
     for (Field field : fields) {
       field.setAccessible(true);
       Object value = field.get(annotationStr);
-      AnnotationAttr annotationAttr = getAnnotationAttr(field);
       String content;
       if (value == null) {
-        content = annotationAttr.defaultText();
+        content = getAnnotationAttr(field).defaultText();
       } else if (PublicUtils.isNumOrBool(value)) {
         content = value.toString();
       } else if (value instanceof List) {
         Class<?> valueClass = (Class<?>) TypeUtil.getTypeArgument(field.getGenericType());
-        if (AnnotationStr.class.isAssignableFrom(valueClass)) {
-          String childContent = ((List<AnnotationStr>) value).stream()
-              .map(this::toStr)
-              .collect(Collectors.joining(",\n", "\n", ""));
-          sb.append(PublicUtils.wrapInCurlyBraces(childContent));
+        if (PublicUtils.isAssignable(AnnotationStr.class, valueClass)) {
+          sb.append(wrapInCurlyBraces(listDeepToStr((List<AnnotationStr>) value)));
           continue;
         }
-        String objectsStr = ((List<Object>) value).stream()
-            .map(object -> PublicUtils.isNumOrBool(object) ? object.toString() : PublicUtils.wrapInDoubleQuotes(object))
-            .collect(Collectors.joining(", "));
-        content = PublicUtils.wrapInCurlyBraces(objectsStr);
+        content = wrapInCurlyBraces(listToStr((List<Object>) value));
       } else {
-        content = PublicUtils.wrapInDoubleQuotes(value);
+        content = wrapInDoubleQuotes(value);
       }
       sb.append(field.getName()).append(" = ").append(content).append(", ");
     }
     return StrUtil.removeSuffix(sb, ", ") + ")";
   }
 
-  private static List<Field> getSortAndShowFields(AnnotationStr annotationStr) {
-    return getSortFields(annotationStr, AnnotationAttr::show);
+  /**
+   * 生成列表中所有AnnotationStr对象的注解字符串
+   *
+   * @param value AnnotationStr对象列表
+   * @return 注解字符串
+   */
+  private String listDeepToStr(List<AnnotationStr> value) {
+    return value.stream()
+        .map(this::toStr)
+        .collect(Collectors.joining(",\n", "\n", ""));
   }
 
+  /**
+   * 生成列表中所有对象的注解字符串
+   *
+   * @param value 非AnnotationStr对象列表
+   * @return 注解字符串
+   */
+  private String listToStr(List<Object> value) {
+    return value.stream()
+        .map(object -> PublicUtils.isNumOrBool(object) ? object.toString() : wrapInDoubleQuotes(object))
+        .collect(Collectors.joining(", "));
+  }
 }

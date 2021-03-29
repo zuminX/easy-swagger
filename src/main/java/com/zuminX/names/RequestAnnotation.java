@@ -2,6 +2,9 @@ package com.zuminX.names;
 
 import lombok.Getter;
 
+/**
+ * Request注解类名
+ */
 public class RequestAnnotation extends ClassName {
 
   public static final RequestAnnotation REQUEST_PARAM;
@@ -24,7 +27,13 @@ public class RequestAnnotation extends ClassName {
     this.type = type;
   }
 
+  /**
+   * 根据全限定类名查找对应的Request注解类名
+   *
+   * @param qualifiedName 全限定类名
+   * @return Request注解类名
+   */
   public static RequestAnnotation findByQualifiedName(String qualifiedName) {
-    return ClassName.findByQualifiedName(RequestAnnotation.class, qualifiedName);
+    return ClassName.findByQualifiedName(qualifiedName);
   }
 }

@@ -35,7 +35,7 @@ public class CoreUtils {
    * 不写/@desc/@describe/@description
    *
    * @param comment 所有注释
-   * @return String
+   * @return 注释
    */
   public static String getCommentDesc(String comment) {
     String[] strings = comment.split("\n");
@@ -73,11 +73,18 @@ public class CoreUtils {
     return StringUtils.trim(stringBuilder.toString());
   }
 
-  private static void appendComment(String string, StringBuilder stringBuilder, int index) {
-    String lowerCaseStr = string.toLowerCase();
+  /**
+   * 追加注释
+   *
+   * @param s     字符串
+   * @param sb    字符串构建对象
+   * @param index 下标
+   */
+  private static void appendComment(String s, StringBuilder sb, int index) {
+    String lowerCaseStr = s.toLowerCase();
     int descIndex = StringUtils.ordinalIndexOf(lowerCaseStr, "@", 1);
     descIndex += index;
-    String desc = string.substring(descIndex);
-    stringBuilder.append(desc);
+    String desc = s.substring(descIndex);
+    sb.append(desc);
   }
 }

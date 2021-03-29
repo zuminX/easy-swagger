@@ -15,6 +15,9 @@ import com.zuminX.settings.SettingKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * 字符串输入框模板
+ */
 public class StringInputTemplate extends BaseInputTemplate<String> {
 
   public StringInputTemplate(@Nullable String defaultValue, @NotNull SettingKey<String> key, Matcher<String> verify) {
@@ -22,7 +25,7 @@ public class StringInputTemplate extends BaseInputTemplate<String> {
     initInput();
   }
 
-  public StringInputTemplate(@NotNull String label, @Nullable String defaultValue, @NotNull SettingKey<String> key,Matcher<String> verify) {
+  public StringInputTemplate(@NotNull String label, @Nullable String defaultValue, @NotNull SettingKey<String> key, Matcher<String> verify) {
     super(label, defaultValue, key, verify, true);
     initInput();
   }

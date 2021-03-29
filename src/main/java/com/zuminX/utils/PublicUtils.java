@@ -2,18 +2,16 @@ package com.zuminX.utils;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.TypeUtil;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 公共工具类
@@ -32,13 +30,40 @@ public class PublicUtils {
   }
 
   /**
-   * 获取指定类的非静态成员字段
+   * 判断指定成员是否被static修饰
    *
-   * @param clazz Class对象
-   * @return Class对象的非静态成员字段列表
+   * @param member 成员对象
+   * @return 若被static修饰则返回true，否则返回false
    */
-  public static List<Field> getNotStaticField(Class<?> clazz) {
-    return getField(clazz, field -> !Modifier.isStatic(field.getModifiers()));
+  public static boolean isStatic(@NotNull Member member) {
+    return Modifier.isStatic(member.getModifiers());
+  }
+
+  /**
+   * 判断class1是否为class2的超类或超接口
+   *
+   * @param class1 类对象
+   * @param class2 类对象
+   * @return 若是则返回true，否则返回false
+   */
+  public static boolean isAssignable(Class<?> class1, Class<?> class2) {
+    return class1.isAssignableFrom(class2);
+  }
+
+  /**
+   * 获取静态字段的值
+   *
+   * @param field 静态字段
+   * @param <T>   值的类型
+   * @return 该字段的值
+   */
+  @SneakyThrows
+  public static <T> T getStaticFieldValue(@NotNull Field field) {
+    if (!isStatic(field)) {
+      return null;
+    }
+    field.setAccessible(true);
+    return (T) field.get(null);
   }
 
   /**
@@ -56,35 +81,32 @@ public class PublicUtils {
   }
 
   /**
-   * 获取合法的数组下标
+   * 获取方法调用链上其父类是clazz的Class对象
    *
-   * @param array 数组
-   * @param index 给定的下标（可能越界）
-   * @param <T>   泛型
-   * @return 下标
+   * @param clazz 父类的Class对象
+   * @param <T> 父类类型
+   * @return Class对象
    */
-  public static <T> int getLegalSubscript(@NotNull T[] array, Integer index) {
-    if (index == null) {
-      return 0;
-    }
-    if (index < 0) {
-      return 0;
-    }
-    if (index >= array.length) {
-      return array.length - 1;
-    }
-    return index;
+  public static <T> Class<? extends T> getCallSubclass(Class<T> clazz) {
+    return (Class<? extends T>) getCallClass(callClazz -> callClazz.getSuperclass() == clazz);
   }
 
   /**
-   * 获取包含泛型参数的对象的第一个泛型
+   * 获取方法调用链上符合条件的Class对象
    *
-   * @param object 对象
-   * @return 泛型对应的Class，若不存在则返回null
+   * @param predicate 过滤条件
+   * @return Class对象
    */
-  @Nullable
-  public static Type getFirstGenericType(@NotNull Object object) {
-    return TypeUtil.getTypeArgument(object.getClass());
+  @SneakyThrows
+  public static Class<?> getCallClass(Predicate<Class<?>> predicate) {
+    StackTraceElement[] elements = (new Throwable()).getStackTrace();
+    for (StackTraceElement ele : elements) {
+      Class<?> clazz = Class.forName(ele.getClassName());
+      if (predicate.test(clazz)) {
+        return clazz;
+      }
+    }
+    return null;
   }
 
   /**

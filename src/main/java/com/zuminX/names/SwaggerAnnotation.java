@@ -1,5 +1,8 @@
 package com.zuminX.names;
 
+/**
+ * Swagger注解类名
+ */
 public class SwaggerAnnotation extends ClassName {
 
   public static final SwaggerAnnotation API;
@@ -17,7 +20,6 @@ public class SwaggerAnnotation extends ClassName {
     API_MODEL_PROPERTY = new SwaggerAnnotation("io.swagger.annotations.ApiModelProperty");
     API_OPERATION = new SwaggerAnnotation("io.swagger.annotations.ApiOperation");
   }
-
 
   public SwaggerAnnotation(String qualifiedName) {
     super(qualifiedName);

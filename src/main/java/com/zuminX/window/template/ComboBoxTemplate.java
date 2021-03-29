@@ -22,6 +22,11 @@ import javax.swing.JPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * 组合框模板
+ *
+ * @param <T> 数据类型
+ */
 public class ComboBoxTemplate<T> extends JPanel implements Option {
 
   public final SettingKey<T> key;

@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.github.zuminX'
-version '1.0.0'
+version '1.1.0'
 
 repositories {
     mavenCentral()
@@ -19,18 +19,9 @@ dependencies {
     implementation 'cn.hutool:hutool-core:5.5.9'
 }
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version '2020.3.2'
     plugins = ['java']
-}
-patchPluginXml {
-    changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
-}
-test {
-    useJUnitPlatform()
 }
 
 tasks.withType(JavaCompile) {

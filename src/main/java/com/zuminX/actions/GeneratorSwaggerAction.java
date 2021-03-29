@@ -11,7 +11,7 @@ import com.intellij.psi.util.PsiUtilBase;
 import com.zuminX.service.Information;
 import com.zuminX.service.Notify;
 import com.zuminX.utils.GeneratorUtils;
-import com.zuminX.window.form.SwaggerAnnotationForm;
+import com.zuminX.window.form.AnnotationForm;
 
 /**
  * 生成Swagger注解的动作类
@@ -34,7 +34,7 @@ public class GeneratorSwaggerAction extends AnAction {
     PsiFile psiFile = PsiUtilBase.getPsiFileInEditor(editor, project);
     String selectionText = editor.getSelectionModel().getSelectedText();
 
-    SwaggerAnnotationForm.loadSettingsData();
+    AnnotationForm.loadSettingsData();
 
     GeneratorUtils generatorUtils = new GeneratorUtils(project, psiFile);
 
@@ -45,7 +45,7 @@ public class GeneratorSwaggerAction extends AnAction {
         generatorUtils.generate(selectionText);
       }
     } catch (Exception e) {
-      Notify.getInstance(project).error(Information.message("generator.annotation.error.unknown"));
+      Notify.getInstance(project).error("generator.annotation.error.unknown");
       e.printStackTrace();
     }
   }

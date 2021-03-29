@@ -2,6 +2,9 @@ package com.zuminX.names;
 
 import java.util.List;
 
+/**
+ * Controller注解类名
+ */
 public class ControllerAnnotation extends ClassName {
 
   public static final ControllerAnnotation CONTROLLER;
@@ -16,7 +19,12 @@ public class ControllerAnnotation extends ClassName {
     super(qualifiedName);
   }
 
+  /**
+   * 获取所有的Controller注解类名列表
+   *
+   * @return Controller注解类名列表
+   */
   public static List<ControllerAnnotation> getAll() {
-    return ClassName.getAll(ControllerAnnotation.class);
+    return ClassName.getAll();
   }
 }

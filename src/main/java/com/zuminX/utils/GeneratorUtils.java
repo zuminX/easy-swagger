@@ -123,7 +123,7 @@ public class GeneratorUtils {
    */
   private void generate(Runnable runnable) {
     if (unableToGenerate()) {
-      Notify.getInstance(project).error(Information.message("generator.annotation.error.unableGenerate"));
+      Notify.getInstance(project).error("generator.annotation.error.unableGenerate");
       return;
     }
     WriteCommandAction.runWriteCommandAction(project, runnable);
@@ -372,7 +372,7 @@ public class GeneratorUtils {
       return null;
     }
     if (psiFields.size() > 1) {
-      Notify.getInstance(project).warning(Information.message("generator.annotation.warning.multipleMethod"));
+      Notify.getInstance(project).warning("generator.annotation.warning.multipleMethod");
     }
     return psiFields.get(0).getName();
   }

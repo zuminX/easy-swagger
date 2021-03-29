@@ -19,6 +19,9 @@ import javax.swing.JTextField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * 数字输入框模板
+ */
 public class NumberInputTemplate extends BaseInputTemplate<Number> {
 
   private boolean withDouble = false;
@@ -29,7 +32,8 @@ public class NumberInputTemplate extends BaseInputTemplate<Number> {
     initVerify();
   }
 
-  public NumberInputTemplate(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<String> verify, boolean withDouble) {
+  public NumberInputTemplate(@NotNull String label, @Nullable Integer defaultValue, @NotNull SettingKey<Number> key, Matcher<String> verify,
+      boolean withDouble) {
     super(label, defaultValue, key, verify, false);
     this.withDouble = withDouble;
     initVerify();

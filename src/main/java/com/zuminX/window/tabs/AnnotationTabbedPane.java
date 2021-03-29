@@ -11,26 +11,29 @@ import com.zuminX.utils.PublicUtils;
 import com.zuminX.window.Option;
 import com.zuminX.window.tabs.domain.AnnotationItem;
 import com.zuminX.window.tabs.domain.AnnotationSettings;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JPanel;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
-public class SwaggerAnnotationTabbedPane extends JBTabbedPane implements Option {
+/**
+ * Swagger注解设置选项卡式窗格类
+ */
+public class AnnotationTabbedPane extends JBTabbedPane implements Option {
 
   public final SettingKey<AnnotationSettings> settingKey;
 
-  private final Map<String, SwaggerAnnotationTable> table = new HashMap<>();
+  private final Map<String, AnnotationTable> table = new HashMap<>();
 
-  public SwaggerAnnotationTabbedPane(SettingKey<AnnotationSettings> settingKey) {
+  public AnnotationTabbedPane(SettingKey<AnnotationSettings> settingKey) {
     this.settingKey = settingKey;
 
     getDefaultItems().getMap().forEach((key, value) -> {
-      SwaggerAnnotationTableModel model = new SwaggerAnnotationTableModel(value);
-      SwaggerAnnotationTable jbTable = new SwaggerAnnotationTable(model);
+      AnnotationTableModel model = new AnnotationTableModel(value);
+      AnnotationTable jbTable = new AnnotationTable(model);
 
       table.put(key, jbTable);
 
@@ -42,6 +45,11 @@ public class SwaggerAnnotationTabbedPane extends JBTabbedPane implements Option 
     });
   }
 
+  /**
+   * 获取默认项
+   *
+   * @return 注解设置信息
+   */
   @SneakyThrows
   public static AnnotationSettings getDefaultItems() {
     Map<String, List<AnnotationItem>> map = new HashMap<>();
@@ -51,14 +59,24 @@ public class SwaggerAnnotationTabbedPane extends JBTabbedPane implements Option 
     return new AnnotationSettings(map);
   }
 
+  /**
+   * 显示设置
+   *
+   * @param setting 设置信息
+   */
   @Override
   public void showSetting(@NotNull Settings setting) {
     setting.getData(settingKey).getMap().forEach((key, value) -> {
-      SwaggerAnnotationTable table = this.table.get(key);
+      AnnotationTable table = this.table.get(key);
       table.setItemList(value);
     });
   }
 
+  /**
+   * 应用设置
+   *
+   * @param setting 设置信息
+   */
   @Override
   public void applySetting(@NotNull Settings setting) {
     Map<String, List<AnnotationItem>> map = new HashMap<>();
@@ -66,12 +84,16 @@ public class SwaggerAnnotationTabbedPane extends JBTabbedPane implements Option 
     setting.putData(settingKey, new AnnotationSettings(map));
   }
 
+  /**
+   * 根据注解字符串类获取注解设置信息列表
+   *
+   * @param annotationStr 注解字符串对象
+   * @return 注解设置信息列表
+   */
   private static List<AnnotationItem> getAnnotationItemList(AnnotationStr annotationStr) {
-    List<AnnotationItem> itemList = new ArrayList<>();
-    AnnotationStr.getSortFields(annotationStr).forEach(field -> {
+    return AnnotationStr.getSortFields(annotationStr).stream().map(field -> {
       AnnotationAttr annotationAttr = AnnotationStr.getAnnotationAttr(field);
-      itemList.add(new AnnotationItem(field.getName(), annotationAttr.defaultText(), annotationAttr.sort(), annotationAttr.show()));
-    });
-    return itemList;
+      return new AnnotationItem(field.getName(), annotationAttr.defaultText(), annotationAttr.sort(), annotationAttr.show());
+    }).collect(Collectors.toList());
   }
 }

@@ -7,6 +7,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JComponent;
 import lombok.Getter;
 
+/**
+ * 设置项
+ */
 @Getter
 public class SettingItem {
 
@@ -19,11 +22,17 @@ public class SettingItem {
     this.form = form;
   }
 
+  /**
+   * 添加选项
+   *
+   * @param option 选项
+   * @return 当前对象
+   */
   @SuppressWarnings("UnusedReturnValue")
-  public SettingItem option(Option option) {
-    this.options.add(option);
+  public SettingItem addOption(Option option) {
+    options.add(option);
     if (option instanceof JComponent) {
-      this.form.addOptionItem((JComponent) option);
+      form.addOptionItem((JComponent) option);
     }
     return this;
   }

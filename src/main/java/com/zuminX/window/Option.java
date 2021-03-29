@@ -13,6 +13,9 @@ package com.zuminX.window;
 import com.zuminX.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * 选项类
+ */
 public interface Option {
 
   /**

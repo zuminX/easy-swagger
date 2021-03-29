@@ -11,6 +11,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * 对应io.swagger.annotations.Api
+ */
 @Data
 @Builder
 @NoArgsConstructor

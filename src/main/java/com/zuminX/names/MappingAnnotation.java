@@ -2,6 +2,9 @@ package com.zuminX.names;
 
 import lombok.Getter;
 
+/**
+ * Mapping注解类名
+ */
 public class MappingAnnotation extends ClassName {
 
   public static final MappingAnnotation REQUEST_MAPPING;
@@ -28,7 +31,13 @@ public class MappingAnnotation extends ClassName {
     this.type = type;
   }
 
+  /**
+   * 根据全限定类名查找对应的Mapping注解类名
+   *
+   * @param qualifiedName 全限定类名
+   * @return Mapping注解类名
+   */
   public static MappingAnnotation findByQualifiedName(String qualifiedName) {
-    return ClassName.findByQualifiedName(MappingAnnotation.class, qualifiedName);
+    return ClassName.findByQualifiedName(qualifiedName);
   }
 }

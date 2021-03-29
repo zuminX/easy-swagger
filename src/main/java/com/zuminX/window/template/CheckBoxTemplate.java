@@ -17,6 +17,9 @@ import com.zuminX.window.Option;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * 复选框模板
+ */
 public class CheckBoxTemplate extends JBCheckBox implements Option {
 
   public final SettingKey<Boolean> key;

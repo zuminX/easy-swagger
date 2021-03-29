@@ -7,32 +7,56 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-public class SwaggerAnnotationTable extends JBTable {
+/**
+ * Swagger注解设置表格
+ */
+public class AnnotationTable extends JBTable {
 
-  private final SwaggerAnnotationTableModel tableModel;
+  private final AnnotationTableModel tableModel;
 
-  public SwaggerAnnotationTable(SwaggerAnnotationTableModel tableModel) {
+  public AnnotationTable(AnnotationTableModel tableModel) {
     super(tableModel);
     this.tableModel = tableModel;
     setTableToCentered();
   }
 
+  /**
+   * 获取注解设置信息列表
+   *
+   * @return 注解设置信息列表
+   */
   public List<AnnotationItem> getItemList() {
     return tableModel.getAnnotationNameItems();
   }
 
+  /**
+   * 设置注解设置信息列表
+   *
+   * @param itemList 注解设置信息列表
+   */
   public void setItemList(List<AnnotationItem> itemList) {
     tableModel.setAnnotationNameItems(itemList);
   }
 
+  /**
+   * 向上移动一行
+   */
   public void moveUp() {
     move(-1);
   }
 
+  /**
+   * 向下移动一行
+   */
   public void moveDown() {
     move(1);
   }
 
+  /**
+   * 移动行
+   *
+   * @param offset 移动量
+   */
   private void move(int offset) {
     int selectedRow = getSelectedRow();
     int index = selectedRow + offset;
@@ -42,6 +66,9 @@ public class SwaggerAnnotationTable extends JBTable {
     setRowSelectionInterval(index, index);
   }
 
+  /**
+   * 设置表格内容为居中显示
+   */
   private void setTableToCentered() {
     //TODO 编辑默认值时内容无法居中显示
     DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();

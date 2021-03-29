@@ -12,13 +12,15 @@ package com.zuminX.settings;
 
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.IntObjectMap;
-import com.intellij.util.containers.IntObjectMap.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Getter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+/**
+ * 键
+ *
+ * @param <T> 值类型
+ */
 public class Key<T> {
 
   private static final AtomicInteger OUR_KEYS_COUNTER = new AtomicInteger();
@@ -38,16 +40,11 @@ public class Key<T> {
     ALL_KEYS.put(getIndex(), this);
   }
 
-  @NotNull
-  public static <T> Key<T> create(@NotNull String name, @NotNull T defaultData) {
-    return new Key<>(name, defaultData);
-  }
-
-  @Nullable
-  public static Key<?> findKeyByName(@NotNull String name) {
-    return ALL_KEYS.entrySet().stream().filter(key -> name.equals(key.getValue().name)).findFirst().map(Entry::getValue).orElse(null);
-  }
-
+  /**
+   * 获取所有的键
+   *
+   * @return 以Map形式封装的所有键
+   */
   @NotNull
   public static IntObjectMap<Key<?>> getAllKeys() {
     return Key.ALL_KEYS;

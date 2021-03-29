@@ -14,7 +14,14 @@
         2.可选择类名、字段名或方法名生成指定的注解；<br>
         3.能通过Settings-Tools-Easy Swagger页中设置是否生成指定注解和默认值。<br>
     ]]></description>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
+
+  <change-notes><![CDATA[
+      <ul>
+        <li> 提示信息和设置页国际化 </li>
+      </ul>
+    ]]>
+  </change-notes>
 
   <idea-version since-build="201.8743"/>
 
@@ -24,9 +31,9 @@
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup id="Easy Swagger Notification Group" displayType="BALLOON" key="notification.group.name"/>
 
-    <applicationService serviceImplementation="com.zuminX.config.SwaggerSetting"/>
+    <applicationService serviceImplementation="com.zuminX.config.SystemSetting"/>
 
-    <applicationConfigurable parentId="tools" instance="com.zuminX.config.SwaggerSettingConfig" id="SwaggerSettingConfig"
+    <applicationConfigurable parentId="tools" instance="com.zuminX.config.SystemSettingConfig" id="SystemSettingConfig"
       dynamic="true"/>
 
     <applicationService serviceImplementation="com.zuminX.service.Information"/>

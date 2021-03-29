@@ -10,7 +10,7 @@
  */
 package com.zuminX.settings;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zuminX.utils.CoreUtils;
 import com.zuminX.window.Option;
@@ -21,12 +21,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Map.Entry;
 import javax.swing.JComponent;
 import lombok.SneakyThrows;
+import org.apache.commons.lang.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * 设置类
+ */
 public class Settings {
 
   /**
@@ -38,10 +42,10 @@ public class Settings {
   /**
    * 获取所有设置项
    *
-   * @return list views
+   * @return 设置项列表
    */
-  @SneakyThrows
   @NotNull
+  @SneakyThrows
   public static List<SettingItem> getAllSettingItems() {
     List<SettingItem> options = new ArrayList<>();
 
@@ -62,7 +66,7 @@ public class Settings {
         if (!(option instanceof JComponent)) {
           continue;
         }
-        item.option(option);
+        item.addOption(option);
       }
       options.add(item);
     }
@@ -71,6 +75,11 @@ public class Settings {
     return options;
   }
 
+  /**
+   * 应用设置
+   *
+   * @param setting 设置对象
+   */
   public void applySetting(@Nullable Settings setting) {
     if (setting == null) {
       return;
@@ -78,9 +87,16 @@ public class Settings {
     setting.properties.forEach(this.properties::put);
   }
 
+  /**
+   * 根据设置键获取数据
+   *
+   * @param key 设置键
+   * @param <T> 数据类型
+   * @return 数据
+   */
   @SneakyThrows
   public <T> T getData(@NotNull SettingKey<T> key) {
-    String value = this.properties.get(key.getName());
+    String value = properties.get(key.getName());
     T defaultValue = key.getDefaultData();
     if (value == null) {
       return defaultValue;
@@ -88,23 +104,41 @@ public class Settings {
     return (T) new ObjectMapper().readValue(value, defaultValue.getClass());
   }
 
+  /**
+   * 存放数据
+   * <p>
+   * 以JSON形式存放数据
+   *
+   * @param key   键
+   * @param value 值
+   * @param <T>   数据类型
+   */
+  @SneakyThrows
   public <T> void putData(@NotNull Key<T> key, @NotNull Object value) {
-    try {
-      this.properties.put(key.getName(), new ObjectMapper().writeValueAsString(value));
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
+    properties.put(key.getName(), new ObjectMapper().writeValueAsString(value));
   }
 
-  public boolean isModified(Settings changedSetting) {
-    if (changedSetting == null) {
+  /**
+   * 判断设置是否被修改
+   *
+   * @param settings 设置
+   * @return 若被修改则返回true，否则返回false
+   */
+  public boolean isModified(Settings settings) {
+    if (settings == null) {
       return false;
     }
-    return changedSetting.properties.entrySet()
-        .stream()
-        .anyMatch(entry -> !Objects.equals(entry.getValue(), this.properties.get(entry.getKey())));
+    for (Entry<String, String> entry : settings.properties.entrySet()) {
+      if (!ObjectUtil.equals(entry.getValue(), this.properties.get(entry.getKey()))) {
+        return true;
+      }
+    }
+    return false;
   }
 
+  /**
+   * 初始化值
+   */
   public void initValue() {
     Key.getAllKeys().values().forEach(key -> putData(key, key.getDefaultData()));
   }

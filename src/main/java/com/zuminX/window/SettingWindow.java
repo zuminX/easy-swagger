@@ -13,14 +13,16 @@ package com.zuminX.window;
 import com.intellij.util.ui.FormBuilder;
 import com.zuminX.settings.SettingItem;
 import com.zuminX.settings.Settings;
-import com.zuminX.window.tabs.SwaggerAnnotationTabbedPane;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-public class SwaggerSettingWindow {
+/**
+ * 设置页视图
+ */
+public class SettingWindow {
 
   public static final int VERTICAL_CLEARANCE = 30;
 
@@ -28,7 +30,7 @@ public class SwaggerSettingWindow {
   private final JPanel content;
   private final List<Option> optionList;
 
-  public SwaggerSettingWindow() {
+  public SettingWindow() {
     optionList = new ArrayList<>();
     FormBuilder builder = FormBuilder.createFormBuilder();
 
@@ -41,6 +43,11 @@ public class SwaggerSettingWindow {
     content = builder.addComponentFillVertically(new JPanel(), VERTICAL_CLEARANCE).getPanel();
   }
 
+  /**
+   * 获取应用设置
+   *
+   * @return 设置
+   */
   @NotNull
   public Settings getAppSetting() {
     Settings setting = new Settings();
@@ -48,6 +55,11 @@ public class SwaggerSettingWindow {
     return setting;
   }
 
+  /**
+   * 设置应用设置
+   *
+   * @param setting 设置
+   */
   public void setAppSetting(Settings setting) {
     if (setting == null) {
       return;

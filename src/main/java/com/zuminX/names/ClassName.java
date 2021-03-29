@@ -1,9 +1,11 @@
 package com.zuminX.names;
 
+import static com.zuminX.utils.PublicUtils.isAssignable;
+import static com.zuminX.utils.PublicUtils.isStatic;
+
 import cn.hutool.core.util.StrUtil;
 import com.zuminX.utils.PublicUtils;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,37 +14,60 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * 类名
+ */
 @Getter
 @AllArgsConstructor
 public class ClassName {
 
+  /**
+   * 全限定类名
+   */
   private final String qualifiedName;
 
-  @SneakyThrows
-  protected static <T extends ClassName> List<T> getAll(@NotNull Class<T> clazz) {
-    List<Field> fields = PublicUtils.getField(clazz,
-        field -> ClassName.class.isAssignableFrom(field.getType()) && Modifier.isStatic(field.getModifiers()));
-    Stream<T> stream = fields.stream().map(ClassName::getStaticFieldValue);
+  /**
+   * 获取指定Class的所有静态ClassName字段值
+   *
+   * @param <T> ClassName字段的实际类型
+   * @return 静态ClassName字段值列表
+   */
+  public static <T extends ClassName> List<T> getAll() {
+    Class<? extends ClassName> clazz = PublicUtils.getCallSubclass(ClassName.class);
+    List<Field> fields = PublicUtils.getField(clazz, field -> isAssignable(ClassName.class, field.getType()) && isStatic(field));
+    Stream<T> stream = fields.stream().map(PublicUtils::getStaticFieldValue);
     return stream.collect(Collectors.toList());
   }
 
-  protected static <T extends ClassName> T findByQualifiedName(@NotNull Class<T> clazz, String qualifiedName) {
+  /**
+   * 查找clazz的指定类名的静态ClassName字段值
+   *
+   * @param qualifiedName 全限定类名
+   * @param <T>           ClassName字段的实际类型
+   * @return 指定类名的静态ClassName字段值
+   */
+  public static <T extends ClassName> T findByQualifiedName(String qualifiedName) {
     if (StrUtil.isBlank(qualifiedName)) {
       return null;
     }
-    List<T> all = getAll(clazz);
-    return all.stream().filter(t -> t.equals(qualifiedName)).findFirst().orElse(null);
+    return (T) getAll().stream().filter(t -> t.equals(qualifiedName)).findFirst().orElse(null);
   }
 
-  @SneakyThrows
-  private static <T extends ClassName> T getStaticFieldValue(Field field) {
-    return (T) field.get(null);
-  }
-
+  /**
+   * 获取当前类名对象的简单类名
+   *
+   * @return 简单类名
+   */
   public String getSimpleName() {
     return PublicUtils.getSimpleNameByQualifiedName(qualifiedName);
   }
 
+  /**
+   * 判断当前类名对象的全限定类名与name是否一致
+   *
+   * @param name 类名
+   * @return 若相同则返回true，否则返回false
+   */
   public boolean equals(String name) {
     return qualifiedName.equals(name);
   }

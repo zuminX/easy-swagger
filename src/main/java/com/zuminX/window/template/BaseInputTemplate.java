@@ -16,7 +16,6 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import com.zuminX.settings.SettingKey;
 import com.zuminX.settings.Settings;
-import com.zuminX.utils.PublicUtils;
 import com.zuminX.window.Option;
 import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
@@ -25,6 +24,11 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * 基本输入框模板
+ *
+ * @param <T> 数据类型
+ */
 public class BaseInputTemplate<T> extends JPanel implements Option {
 
   public final SettingKey<T> key;
