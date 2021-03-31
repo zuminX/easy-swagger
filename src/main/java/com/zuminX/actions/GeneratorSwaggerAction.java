@@ -35,8 +35,6 @@ public class GeneratorSwaggerAction extends AnAction {
     PsiFile psiFile = PsiUtilBase.getPsiFileInEditor(editor, project);
     String selectionText = editor.getSelectionModel().getSelectedText();
 
-    Settings setting = SystemSetting.getInstance().getSetting();
-
     AnnotationForm.loadSettingsData();
 
     GeneratorUtils generatorUtils = new GeneratorUtils(project, psiFile);

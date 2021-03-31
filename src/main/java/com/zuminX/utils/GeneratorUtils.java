@@ -19,15 +19,11 @@ import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiImportList;
 import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.impl.java.stubs.impl.PsiLiteralStub;
-import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl;
-import com.intellij.psi.infos.CandidateInfo;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -46,7 +42,6 @@ import com.zuminX.names.SwaggerAnnotation;
 import com.zuminX.service.Notify;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -369,14 +364,14 @@ public class GeneratorUtils {
     if (!MappingAnnotation.REQUEST_MAPPING.equals(mapping)) {
       return mapping.getType();
     }
-    List<PsiField> psiFields = getFieldOfAnnotationMemberValue(annotation, "method");
-    if (psiFields.isEmpty()) {
+    List<String> values = getValueOfAnnotationMemberValue(annotation, "method");
+    if (values.isEmpty()) {
       return null;
     }
-    if (psiFields.size() > 1) {
+    if (values.size() > 1) {
       Notify.getInstance(project).warning("generator.annotation.warning.multipleMethod");
     }
-    return psiFields.get(0).getName();
+    return values.get(0);
   }
 
   /**
@@ -406,7 +401,7 @@ public class GeneratorUtils {
   }
 
   /**
-   * 获取注解属性值
+   * 获取注解属性文本
    *
    * @param psiAnnotation 注解全路径
    * @param attributeName 注解属性名
@@ -422,25 +417,22 @@ public class GeneratorUtils {
   }
 
   /**
-   * 获取注释成员值的Psi字段
+   * 获取注解属性值
    *
    * @param psiAnnotation 注解全路径
    * @param attributeName 注解属性名
    */
-  private List<PsiField> getFieldOfAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
+  private List<String> getValueOfAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
     PsiAnnotationMemberValue psiAnnotationMemberValue = psiAnnotation.findDeclaredAttributeValue(attributeName);
     if (psiAnnotationMemberValue == null) {
       return ListUtil.empty();
     }
+    //获取实际类型：((ClsEnumConstantImpl) resolve).getStub().getType(false).toString()
     return Arrays.stream(psiAnnotationMemberValue.getChildren())
         .flatMap(child -> Arrays.stream(child.getReferences()))
-        .map(PsiReference::resolveReference)
-        .flatMap(Collection::stream)
-        .filter(resolveResult -> resolveResult instanceof CandidateInfo)
-        .map(resolveResult -> (CandidateInfo) resolveResult)
-        .map(CandidateInfo::getElement)
-        .filter(psiElement -> psiElement instanceof PsiField)
-        .map(psiElement -> (PsiField) psiElement)
+        .map(PsiReference::resolve)
+        .filter(Objects::nonNull)
+        .map(PsiElement::getText)
         .collect(Collectors.toList());
   }
 

@@ -24,6 +24,15 @@ intellij {
     plugins = ['java']
 }
 
+runIde {
+    autoReloadPlugins = true
+}
+
+patchPluginXml {
+    sinceBuild customSinceBuild
+    untilBuild customUntilBuild
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
