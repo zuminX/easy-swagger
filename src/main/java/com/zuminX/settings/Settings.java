@@ -12,6 +12,7 @@ package com.zuminX.settings;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zuminX.config.SystemSetting;
 import com.zuminX.utils.CoreUtils;
 import com.zuminX.window.Option;
 import com.zuminX.window.OptionForm;
@@ -21,10 +22,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.swing.JComponent;
 import lombok.SneakyThrows;
-import org.apache.commons.lang.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -85,6 +84,8 @@ public class Settings {
       return;
     }
     setting.properties.forEach(this.properties::put);
+    //TODO 临时解决setting无法持久化的问题
+    SystemSetting.getInstance().setSetting(this);
   }
 
   /**
@@ -128,12 +129,7 @@ public class Settings {
     if (settings == null) {
       return false;
     }
-    for (Entry<String, String> entry : settings.properties.entrySet()) {
-      if (!ObjectUtil.equals(entry.getValue(), this.properties.get(entry.getKey()))) {
-        return true;
-      }
-    }
-    return false;
+    return settings.properties.entrySet().stream().anyMatch(entry -> !ObjectUtil.equals(entry.getValue(), this.properties.get(entry.getKey())));
   }
 
   /**

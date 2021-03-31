@@ -14,11 +14,13 @@
         2.可选择类名、字段名或方法名生成指定的注解；<br>
         3.能通过Settings-Tools-Easy Swagger页中设置是否生成指定注解和默认值。<br>
     ]]></description>
-  <version>1.1.0</version>
+  <version>1.1.2</version>
 
   <change-notes><![CDATA[
       <ul>
         <li> 提示信息和设置页国际化 </li>
+        <li> 修复当注解存在value属性时，而其他属性没有赋值且默认值为空字符串时，该属性会被忽略的问题 </li>
+        <li> 修复设置项无法持久化的问题 </li>
       </ul>
     ]]>
   </change-notes>

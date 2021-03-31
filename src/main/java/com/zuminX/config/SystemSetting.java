@@ -6,7 +6,6 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.zuminX.settings.Settings;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,8 +17,7 @@ public class SystemSetting implements PersistentStateComponent<SystemSetting> {
 
   public static final String IDE = "EasySwaggerSetting.xml";
 
-  @Getter
-  private final Settings setting;
+  private Settings setting;
 
   public SystemSetting() {
     setting = new Settings();
@@ -73,5 +71,13 @@ public class SystemSetting implements PersistentStateComponent<SystemSetting> {
   @Override
   public void loadState(@NotNull SystemSetting state) {
     XmlSerializerUtil.copyBean(state, this);
+  }
+
+  public Settings getSetting() {
+    return this.setting;
+  }
+
+  public void setSetting(Settings setting) {
+    this.setting = setting;
   }
 }

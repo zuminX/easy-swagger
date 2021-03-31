@@ -31,7 +31,7 @@ public class AnnotationTabbedPane extends JBTabbedPane implements Option {
   public AnnotationTabbedPane(SettingKey<AnnotationSettings> settingKey) {
     this.settingKey = settingKey;
 
-    getDefaultItems().getMap().forEach((key, value) -> {
+    this.settingKey.getData().getMap().forEach((key, value) -> {
       AnnotationTableModel model = new AnnotationTableModel(value);
       AnnotationTable jbTable = new AnnotationTable(model);
 

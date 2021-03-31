@@ -8,8 +8,9 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
-import com.zuminX.service.Information;
+import com.zuminX.config.SystemSetting;
 import com.zuminX.service.Notify;
+import com.zuminX.settings.Settings;
 import com.zuminX.utils.GeneratorUtils;
 import com.zuminX.window.form.AnnotationForm;
 
@@ -33,6 +34,8 @@ public class GeneratorSwaggerAction extends AnAction {
 
     PsiFile psiFile = PsiUtilBase.getPsiFileInEditor(editor, project);
     String selectionText = editor.getSelectionModel().getSelectedText();
+
+    Settings setting = SystemSetting.getInstance().getSetting();
 
     AnnotationForm.loadSettingsData();
 

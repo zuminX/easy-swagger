@@ -111,7 +111,8 @@ public abstract class AnnotationStr {
       Object value = field.get(annotationStr);
       String content;
       if (value == null) {
-        content = getAnnotationAttr(field).defaultText();
+        String defaultText = getAnnotationAttr(field).defaultText();
+        content = StrUtil.isBlank(defaultText) ? getDefaultTextByType(field.getType()) : defaultText;
       } else if (PublicUtils.isNumOrBool(value)) {
         content = value.toString();
       } else if (value instanceof List) {
@@ -151,5 +152,27 @@ public abstract class AnnotationStr {
     return value.stream()
         .map(object -> PublicUtils.isNumOrBool(object) ? object.toString() : wrapInDoubleQuotes(object))
         .collect(Collectors.joining(", "));
+  }
+
+  /**
+   * 根据类型获取对应的默认文本
+   *
+   * @param clazz 类型
+   * @return 默认文本
+   */
+  private String getDefaultTextByType(Class<?> clazz) {
+    if (PublicUtils.isAssignable(Number.class, clazz)) {
+      return "0";
+    }
+    if (clazz == Boolean.class) {
+      return "false";
+    }
+    if (clazz == List.class) {
+      return wrapInCurlyBraces("");
+    }
+    if (clazz == Class.class) {
+      return "Void.class";
+    }
+    return wrapInDoubleQuotes("");
   }
 }
