@@ -3,6 +3,8 @@ package com.zuminX.interceptor;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.zuminX.annotations.AnnotationStr;
+import com.zuminX.domain.GeneratorPsi;
+import com.zuminX.utils.GeneratorUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import lombok.AllArgsConstructor;
@@ -11,12 +13,12 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
 @AllArgsConstructor
-public class AnnotationBuilderInterceptor implements MethodInterceptor {
+public class AnnotationGeneratorInterceptor implements MethodInterceptor {
 
   private final Class<? extends AnnotationStr> annotationClazz;
 
   public static <T> T create(Class<T> target, Class<? extends AnnotationStr> annotationClazz) {
-    AnnotationBuilderInterceptor interceptor = new AnnotationBuilderInterceptor(annotationClazz);
+    AnnotationGeneratorInterceptor interceptor = new AnnotationGeneratorInterceptor(annotationClazz);
     return (T) interceptor.cglibProxyGenerator(target);
   }
 
@@ -30,7 +32,11 @@ public class AnnotationBuilderInterceptor implements MethodInterceptor {
         return null;
       }
     }
-    return methodProxy.invokeSuper(o, objects);
+    Object result = methodProxy.invokeSuper(o, objects);
+    if (name.equals("add") && result != null) {
+      GeneratorUtils.doWrite((AnnotationStr) result, (GeneratorPsi<?>) objects[0]);
+    }
+    return result;
   }
 
   /**

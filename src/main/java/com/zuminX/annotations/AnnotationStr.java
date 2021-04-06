@@ -4,6 +4,7 @@ import static com.zuminX.utils.PublicUtils.wrapInCurlyBraces;
 import static com.zuminX.utils.PublicUtils.wrapInDoubleQuotes;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import com.zuminX.names.ClassName;

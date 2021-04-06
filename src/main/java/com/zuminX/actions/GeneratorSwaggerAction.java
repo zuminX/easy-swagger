@@ -38,11 +38,7 @@ public class GeneratorSwaggerAction extends AnAction {
     AnnotationForm.loadSettingsData();
 
     try {
-      if (StrUtil.isBlank(selectionText)) {
-        GeneratorUtils.generate(psiFile);
-      } else {
         GeneratorUtils.generate(psiFile, selectionText);
-      }
     } catch (Exception e) {
       Notify.getInstance(project).error("generator.annotation.error.unknown");
       e.printStackTrace();

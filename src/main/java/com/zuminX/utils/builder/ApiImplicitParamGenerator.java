@@ -3,15 +3,15 @@ package com.zuminX.utils.builder;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiParameter;
 import com.zuminX.annotations.swagger.ApiImplicitParam;
-import com.zuminX.interceptor.AnnotationBuilderInterceptor;
+import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.names.RequestAnnotation;
 import com.zuminX.utils.PublicUtils;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class ApiImplicitParamBuilder {
+public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParameter, ApiImplicitParam> {
 
-  public static final ApiImplicitParamBuilder BUILDER = AnnotationBuilderInterceptor.create(ApiImplicitParamBuilder.class, ApiImplicitParam.class);
+  public static final ApiImplicitParamGenerator INSTANCE = AnnotationGeneratorInterceptor.create(ApiImplicitParamGenerator.class, ApiImplicitParam.class);
 
   public final ApiImplicitParam build(PsiParameter psiParameter) {
     return ApiImplicitParam.builder()
@@ -39,5 +39,5 @@ public class ApiImplicitParamBuilder {
         .map(RequestAnnotation::getType)
         .orElse(null);
   }
-  
+
 }

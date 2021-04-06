@@ -2,11 +2,15 @@ package com.zuminX.utils;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
@@ -19,13 +23,32 @@ import org.jetbrains.annotations.NotNull;
 @UtilityClass
 public class PublicUtils {
 
+  public Set<Class<?>> findClassReferenced(Class<?> clazz, Predicate<Class<?>> predicate) {
+    Set<Class<?>> result = new HashSet<>();
+    if (predicate.test(clazz)) {
+      result.add(clazz);
+    }
+    Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
+      Type typeArgument = TypeUtil.getTypeArgument(field.getGenericType());
+      if (typeArgument != null) {
+        if (predicate.test((Class<?>) typeArgument)) {
+          result.add((Class<?>) typeArgument);
+        }
+      }
+      if (predicate.test(field.getType())) {
+        result.add(field.getType());
+      }
+    });
+    return result;
+  }
+
   /**
    * 判断value对象是否为数字或布尔值
    *
    * @param value 对象
    * @return 若是数字或布尔值则返回true，否则返回false
    */
-  public static boolean isNumOrBool(Object value) {
+  public boolean isNumOrBool(Object value) {
     return value instanceof Number || value instanceof Boolean;
   }
 
@@ -35,7 +58,7 @@ public class PublicUtils {
    * @param member 成员对象
    * @return 若被static修饰则返回true，否则返回false
    */
-  public static boolean isStatic(@NotNull Member member) {
+  public boolean isStatic(@NotNull Member member) {
     return Modifier.isStatic(member.getModifiers());
   }
 
@@ -46,7 +69,7 @@ public class PublicUtils {
    * @param class2 类对象
    * @return 若是则返回true，否则返回false
    */
-  public static boolean isAssignable(Class<?> class1, Class<?> class2) {
+  public boolean isAssignable(Class<?> class1, Class<?> class2) {
     return class1.isAssignableFrom(class2);
   }
 
@@ -58,7 +81,7 @@ public class PublicUtils {
    * @return 该字段的值
    */
   @SneakyThrows
-  public static <T> T getStaticFieldValue(@NotNull Field field) {
+  public <T> T getStaticFieldValue(@NotNull Field field) {
     if (!isStatic(field)) {
       return null;
     }
@@ -72,7 +95,7 @@ public class PublicUtils {
    * @param qualifiedName 全限定类名
    * @return 简单类名
    */
-  public static String getSimpleNameByQualifiedName(String qualifiedName) {
+  public String getSimpleNameByQualifiedName(String qualifiedName) {
     if (StrUtil.isEmpty(qualifiedName)) {
       return null;
     }
@@ -84,10 +107,10 @@ public class PublicUtils {
    * 获取方法调用链上其父类是clazz的Class对象
    *
    * @param clazz 父类的Class对象
-   * @param <T> 父类类型
+   * @param <T>   父类类型
    * @return Class对象
    */
-  public static <T> Class<? extends T> getCallSubclass(Class<T> clazz) {
+  public <T> Class<? extends T> getCallSubclass(Class<T> clazz) {
     return (Class<? extends T>) getCallClass(callClazz -> callClazz.getSuperclass() == clazz);
   }
 
@@ -98,7 +121,7 @@ public class PublicUtils {
    * @return Class对象
    */
   @SneakyThrows
-  public static Class<?> getCallClass(Predicate<Class<?>> predicate) {
+  public Class<?> getCallClass(Predicate<Class<?>> predicate) {
     StackTraceElement[] elements = (new Throwable()).getStackTrace();
     for (StackTraceElement ele : elements) {
       Class<?> clazz = Class.forName(ele.getClassName());
@@ -116,7 +139,7 @@ public class PublicUtils {
    * @param predicate 过滤条件
    * @return 符合过滤条件的成员字段列表
    */
-  public static List<Field> getField(Class<?> clazz, Predicate<Field> predicate) {
+  public List<Field> getField(Class<?> clazz, Predicate<Field> predicate) {
     Field[] fields = clazz.getDeclaredFields();
     return Arrays.stream(fields)
         .filter(predicate)
@@ -129,7 +152,7 @@ public class PublicUtils {
    * @param value 字符串
    * @return 包裹后的字符串
    */
-  public static String wrapInDoubleQuotes(Object value) {
+  public String wrapInDoubleQuotes(Object value) {
     return wrap(value, "\"");
   }
 
@@ -141,7 +164,7 @@ public class PublicUtils {
    * @param value 字符串
    * @return 去除后的字符串
    */
-  public static String unwrapInDoubleQuotes(Object value) {
+  public String unwrapInDoubleQuotes(Object value) {
     String str = Convert.toStr(value);
     if (str == null) {
       return null;
@@ -161,7 +184,7 @@ public class PublicUtils {
    * @param value 字符串
    * @return 包裹后的字符串
    */
-  public static String wrapInCurlyBraces(Object value) {
+  public String wrapInCurlyBraces(Object value) {
     return wrap(value, "{", "}");
   }
 
@@ -172,7 +195,7 @@ public class PublicUtils {
    * @param wrap  包裹字符串
    * @return 包裹后的字符串
    */
-  private static String wrap(Object value, String wrap) {
+  private String wrap(Object value, String wrap) {
     return wrap(value, wrap, wrap);
   }
 
@@ -184,7 +207,7 @@ public class PublicUtils {
    * @param rightWrap 尾部字符串
    * @return 包裹后的字符串
    */
-  private static String wrap(Object value, String leftWrap, String rightWrap) {
+  private String wrap(Object value, String leftWrap, String rightWrap) {
     String str = Convert.toStr(value, "");
     return leftWrap + str + rightWrap;
   }

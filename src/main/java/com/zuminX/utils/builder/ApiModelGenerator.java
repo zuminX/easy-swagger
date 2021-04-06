@@ -1,13 +1,15 @@
 package com.zuminX.utils.builder;
 
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiMethod;
+import com.zuminX.annotations.swagger.ApiImplicitParams;
 import com.zuminX.annotations.swagger.ApiModel;
-import com.zuminX.interceptor.AnnotationBuilderInterceptor;
+import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.utils.GeneratorUtils;
 
-public class ApiModelBuilder {
+public class ApiModelGenerator implements AnnotationGenerator<PsiClass, ApiModel> {
 
-  public static final ApiModelBuilder BUILDER = AnnotationBuilderInterceptor.create(ApiModelBuilder.class, ApiModel.class);
+  public static final ApiModelGenerator INSTANCE = AnnotationGeneratorInterceptor.create(ApiModelGenerator.class, ApiModel.class);
 
   public final ApiModel build(PsiClass psiClass) {
     return ApiModel.builder().description(getDescription(psiClass)).build();

@@ -3,6 +3,7 @@ package com.zuminX.utils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -32,11 +33,11 @@ import com.zuminX.names.ControllerAnnotation;
 import com.zuminX.names.MappingAnnotation;
 import com.zuminX.names.SwaggerAnnotation;
 import com.zuminX.service.Notify;
-import com.zuminX.utils.builder.ApiBuilder;
-import com.zuminX.utils.builder.ApiImplicitParamsBuilder;
-import com.zuminX.utils.builder.ApiModelBuilder;
-import com.zuminX.utils.builder.ApiModelPropertyBuilder;
-import com.zuminX.utils.builder.ApiOperationBuilder;
+import com.zuminX.utils.builder.ApiGenerator;
+import com.zuminX.utils.builder.ApiImplicitParamsGenerator;
+import com.zuminX.utils.builder.ApiModelGenerator;
+import com.zuminX.utils.builder.ApiModelPropertyGenerator;
+import com.zuminX.utils.builder.ApiOperationGenerator;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -51,21 +52,17 @@ import org.jetbrains.annotations.Nullable;
 public class GeneratorUtils {
 
   /**
-   * 根据当前类生成Swagger注解
-   */
-  public void generate(PsiFile psiFile) {
-    GeneratorPsi<PsiClass> generatorPsi = GeneratorPsi.build(psiFile);
-    generate(() -> generateDefault(generatorPsi), generatorPsi);
-  }
-
-  /**
    * 根据所选择的内容生成对应的Swagger注解
    *
    * @param selectionText 选择的文本
    */
   public void generate(PsiFile psiFile, String selectionText) {
     GeneratorPsi<PsiClass> generatorPsi = GeneratorPsi.build(psiFile);
-    generate(() -> generateSelection(selectionText, generatorPsi), generatorPsi);
+    if (StrUtil.isBlank(selectionText)) {
+      generate(() -> generateDefault(generatorPsi), generatorPsi);
+    } else {
+      generate(() -> generateSelection(selectionText, generatorPsi), generatorPsi);
+    }
   }
 
   /**
@@ -182,22 +179,6 @@ public class GeneratorUtils {
   }
 
   /**
-   * 根据当前类生成Swagger注解
-   *
-   * @param generatorPsi 生成注解的PSI元素
-   */
-  private void generateDefault(GeneratorPsi<PsiClass> generatorPsi) {
-    PsiClass psiClass = generatorPsi.getElement();
-    if (isController(psiClass)) {
-      generateControllerClassAnnotation(generatorPsi);
-      Arrays.stream(psiClass.getMethods()).forEach(psiMethod -> generateMethodAnnotation(generatorPsi.replace(psiMethod)));
-    } else {
-      generateDomainClassAnnotation(generatorPsi);
-      Arrays.stream(psiClass.getAllFields()).forEach(psiField -> generateFieldAnnotation(generatorPsi.replace(psiField)));
-    }
-  }
-
-  /**
    * 根据所选择的内容生成对应的Swagger注解
    */
   public void generateSelection(String selectionText, GeneratorPsi<PsiClass> generatorPsi) {
@@ -218,6 +199,19 @@ public class GeneratorUtils {
   }
 
   /**
+   * 写入Swagger注解到文件
+   *
+   * @param annotationStr 注解字符串对象
+   * @param generatorPsi  生成注解的PSI元素
+   */
+  public void doWrite(AnnotationStr annotationStr, GeneratorPsi<?> generatorPsi) {
+    ClassName className = annotationStr.getClassName();
+    removeAnnotation(className.getQualifiedName(), generatorPsi.getElement());
+    addImport(generatorPsi.getPsiFile(), className);
+    addAnnotation(className.getSimpleName(), annotationStr.toStr(), generatorPsi.getElement());
+  }
+
+  /**
    * 生成Swagger注解
    *
    * @param runnable     任务
@@ -232,16 +226,19 @@ public class GeneratorUtils {
   }
 
   /**
-   * 写入Swagger注解到文件
+   * 根据当前类生成Swagger注解
    *
-   * @param annotationStr        注解字符串对象
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void doWrite(AnnotationStr annotationStr, GeneratorPsi<?> generatorPsi) {
-    ClassName className = annotationStr.getClassName();
-    removeAnnotation(className.getQualifiedName(), generatorPsi.getElement());
-    addImport(generatorPsi.getPsiFile(), className);
-    addAnnotation(className.getSimpleName(), annotationStr.toStr(), generatorPsi.getElement());
+  private void generateDefault(GeneratorPsi<PsiClass> generatorPsi) {
+    PsiClass psiClass = generatorPsi.getElement();
+    if (isController(psiClass)) {
+      generateControllerClassAnnotation(generatorPsi);
+      Arrays.stream(psiClass.getMethods()).forEach(psiMethod -> generateMethodAnnotation(generatorPsi.replace(psiMethod)));
+    } else {
+      generateDomainClassAnnotation(generatorPsi);
+      Arrays.stream(psiClass.getAllFields()).forEach(psiField -> generateFieldAnnotation(generatorPsi.replace(psiField)));
+    }
   }
 
   /**
@@ -334,7 +331,7 @@ public class GeneratorUtils {
    * @param generatorPsi 生成注解的PSI元素
    */
   private void generateControllerClassAnnotation(GeneratorPsi<PsiClass> generatorPsi) {
-    doWrite(ApiBuilder.BUILDER.build(generatorPsi.getElement()), generatorPsi);
+    ApiGenerator.INSTANCE.add(generatorPsi);
   }
 
   /**
@@ -343,7 +340,7 @@ public class GeneratorUtils {
    * @param generatorPsi 生成注解的PSI元素
    */
   private void generateDomainClassAnnotation(GeneratorPsi<PsiClass> generatorPsi) {
-    doWrite(ApiModelBuilder.BUILDER.build(generatorPsi.getElement()), generatorPsi);
+    ApiModelGenerator.INSTANCE.add(generatorPsi);
   }
 
   /**
@@ -363,7 +360,7 @@ public class GeneratorUtils {
    * @param generatorPsi 生成注解的PSI元素
    */
   private void generateMethodOperationAnnotation(GeneratorPsi<PsiMethod> generatorPsi) {
-    doWrite(ApiOperationBuilder.BUILDER.build(generatorPsi.getElement()), generatorPsi);
+    ApiOperationGenerator.INSTANCE.add(generatorPsi);
   }
 
   /**
@@ -372,11 +369,7 @@ public class GeneratorUtils {
    * @param generatorPsi 生成注解的PSI元素
    */
   private void generateMethodParameterAnnotation(GeneratorPsi<PsiMethod> generatorPsi) {
-    PsiParameter[] psiParameters = generatorPsi.getElement().getParameterList().getParameters();
-    if (ArrayUtil.isEmpty(psiParameters)) {
-      return;
-    }
-    doWrite(ApiImplicitParamsBuilder.BUILDER.build(psiParameters), generatorPsi);
+    ApiImplicitParamsGenerator.INSTANCE.add(generatorPsi);
   }
 
   /**
@@ -385,7 +378,7 @@ public class GeneratorUtils {
    * @param generatorPsi 生成注解的PSI元素
    */
   private void generateFieldAnnotation(GeneratorPsi<PsiField> generatorPsi) {
-    doWrite(ApiModelPropertyBuilder.BUILDER.build(generatorPsi.getElement()), generatorPsi);
+    ApiModelPropertyGenerator.INSTANCE.add(generatorPsi);
   }
 
   /**

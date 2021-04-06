@@ -2,15 +2,17 @@ package com.zuminX.utils.builder;
 
 import cn.hutool.core.convert.Convert;
 import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
+import com.zuminX.annotations.swagger.ApiModelProperty;
 import com.zuminX.annotations.swagger.ApiOperation;
-import com.zuminX.interceptor.AnnotationBuilderInterceptor;
+import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.names.SwaggerAnnotation;
 import com.zuminX.utils.GeneratorUtils;
 
-public class ApiOperationBuilder {
+public class ApiOperationGenerator implements AnnotationGenerator<PsiMethod, ApiOperation> {
 
-  public static final ApiOperationBuilder BUILDER = AnnotationBuilderInterceptor.create(ApiOperationBuilder.class, ApiOperation.class);
+  public static final ApiOperationGenerator INSTANCE = AnnotationGeneratorInterceptor.create(ApiOperationGenerator.class, ApiOperation.class);
 
   public final ApiOperation build(PsiMethod psiMethod) {
     PsiAnnotation apiOperationExist = psiMethod.getModifierList().findAnnotation(SwaggerAnnotation.API_OPERATION.getQualifiedName());
