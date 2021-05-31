@@ -1,7 +1,5 @@
 package com.zuminX.names;
 
-import lombok.Getter;
-
 /**
  * Request注解类名
  */
@@ -19,7 +17,6 @@ public class RequestAnnotation extends ClassName {
     REQUEST_BODY = new RequestAnnotation("org.springframework.web.bind.annotation.RequestBody", "body");
   }
 
-  @Getter
   private final String type;
 
   public RequestAnnotation(String qualifiedName, String type) {
@@ -35,5 +32,9 @@ public class RequestAnnotation extends ClassName {
    */
   public static RequestAnnotation findByQualifiedName(String qualifiedName) {
     return ClassName.findByQualifiedName(qualifiedName);
+  }
+
+  public String getType() {
+    return this.type;
   }
 }

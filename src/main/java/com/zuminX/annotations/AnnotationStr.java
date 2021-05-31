@@ -4,7 +4,6 @@ import static com.zuminX.utils.PublicUtils.wrapInCurlyBraces;
 import static com.zuminX.utils.PublicUtils.wrapInDoubleQuotes;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import com.zuminX.names.ClassName;
@@ -21,32 +20,6 @@ import lombok.SneakyThrows;
  * 注解字符串类
  */
 public abstract class AnnotationStr {
-
-  /**
-   * 获取该注解的类名对象
-   *
-   * @return 类名对象
-   */
-  public abstract ClassName getClassName();
-
-  /**
-   * 获取无内容的注解字符串
-   *
-   * @return 注解字符串
-   */
-  public String empty() {
-    return "@" + getClassName().getSimpleName();
-  }
-
-  /**
-   * 获取注解字符串
-   *
-   * @param <T> 父类或超类是注解字符串类的类
-   * @return 注解字符串
-   */
-  public <T extends AnnotationStr> String toStr() {
-    return toStr(this);
-  }
 
   /**
    * 获取指定字段上的AnnotationAttr注解
@@ -90,6 +63,32 @@ public abstract class AnnotationStr {
    */
   private static List<Field> getSortAndShowFields(AnnotationStr annotationStr) {
     return getSortFields(annotationStr, AnnotationAttr::show);
+  }
+
+  /**
+   * 获取该注解的类名对象
+   *
+   * @return 类名对象
+   */
+  public abstract ClassName getClassName();
+
+  /**
+   * 获取无内容的注解字符串
+   *
+   * @return 注解字符串
+   */
+  public String empty() {
+    return "@" + getClassName().getSimpleName();
+  }
+
+  /**
+   * 获取注解字符串
+   *
+   * @param <T> 父类或超类是注解字符串类的类
+   * @return 注解字符串
+   */
+  public <T extends AnnotationStr> String toStr() {
+    return toStr(this);
   }
 
   /**
@@ -140,7 +139,7 @@ public abstract class AnnotationStr {
   private String listDeepToStr(List<AnnotationStr> value) {
     return value.stream()
         .map(this::toStr)
-        .collect(Collectors.joining(",\n", "\n", ""));
+        .collect(Collectors.joining(",\n", "\n", "\n"));
   }
 
   /**

@@ -7,15 +7,17 @@ import com.zuminX.domain.GeneratorPsi;
 import com.zuminX.utils.GeneratorUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import lombok.AllArgsConstructor;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-@AllArgsConstructor
 public class AnnotationGeneratorInterceptor implements MethodInterceptor {
 
   private final Class<? extends AnnotationStr> annotationClazz;
+
+  public AnnotationGeneratorInterceptor(Class<? extends AnnotationStr> annotationClazz) {
+    this.annotationClazz = annotationClazz;
+  }
 
   public static <T> T create(Class<T> target, Class<? extends AnnotationStr> annotationClazz) {
     AnnotationGeneratorInterceptor interceptor = new AnnotationGeneratorInterceptor(annotationClazz);

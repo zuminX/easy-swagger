@@ -16,7 +16,6 @@ import com.zuminX.settings.Settings;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -26,7 +25,6 @@ public class SettingWindow {
 
   public static final int VERTICAL_CLEARANCE = 30;
 
-  @Getter
   private final JPanel content;
   private final List<Option> optionList;
 
@@ -65,5 +63,9 @@ public class SettingWindow {
       return;
     }
     optionList.forEach(item -> item.showSetting(setting));
+  }
+
+  public JPanel getContent() {
+    return this.content;
   }
 }

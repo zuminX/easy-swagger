@@ -14,16 +14,18 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * 公共工具类
  */
-@UtilityClass
-public class PublicUtils {
+public final class PublicUtils {
 
-  public Set<Class<?>> findClassReferenced(Class<?> clazz, Predicate<Class<?>> predicate) {
+  private PublicUtils() {
+    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+  }
+
+  public static Set<Class<?>> findClassReferenced(Class<?> clazz, Predicate<Class<?>> predicate) {
     Set<Class<?>> result = new HashSet<>();
     if (predicate.test(clazz)) {
       result.add(clazz);
@@ -48,7 +50,7 @@ public class PublicUtils {
    * @param value 对象
    * @return 若是数字或布尔值则返回true，否则返回false
    */
-  public boolean isNumOrBool(Object value) {
+  public static boolean isNumOrBool(Object value) {
     return value instanceof Number || value instanceof Boolean;
   }
 
@@ -58,7 +60,7 @@ public class PublicUtils {
    * @param member 成员对象
    * @return 若被static修饰则返回true，否则返回false
    */
-  public boolean isStatic(@NotNull Member member) {
+  public static boolean isStatic(@NotNull Member member) {
     return Modifier.isStatic(member.getModifiers());
   }
 
@@ -69,7 +71,7 @@ public class PublicUtils {
    * @param class2 类对象
    * @return 若是则返回true，否则返回false
    */
-  public boolean isAssignable(Class<?> class1, Class<?> class2) {
+  public static boolean isAssignable(Class<?> class1, Class<?> class2) {
     return class1.isAssignableFrom(class2);
   }
 
@@ -81,7 +83,7 @@ public class PublicUtils {
    * @return 该字段的值
    */
   @SneakyThrows
-  public <T> T getStaticFieldValue(@NotNull Field field) {
+  public static <T> T getStaticFieldValue(@NotNull Field field) {
     if (!isStatic(field)) {
       return null;
     }
@@ -95,7 +97,7 @@ public class PublicUtils {
    * @param qualifiedName 全限定类名
    * @return 简单类名
    */
-  public String getSimpleNameByQualifiedName(String qualifiedName) {
+  public static String getSimpleNameByQualifiedName(String qualifiedName) {
     if (StrUtil.isEmpty(qualifiedName)) {
       return null;
     }
@@ -110,7 +112,7 @@ public class PublicUtils {
    * @param <T>   父类类型
    * @return Class对象
    */
-  public <T> Class<? extends T> getCallSubclass(Class<T> clazz) {
+  public static <T> Class<? extends T> getCallSubclass(Class<T> clazz) {
     return (Class<? extends T>) getCallClass(callClazz -> callClazz.getSuperclass() == clazz);
   }
 
@@ -121,7 +123,7 @@ public class PublicUtils {
    * @return Class对象
    */
   @SneakyThrows
-  public Class<?> getCallClass(Predicate<Class<?>> predicate) {
+  public static Class<?> getCallClass(Predicate<Class<?>> predicate) {
     StackTraceElement[] elements = (new Throwable()).getStackTrace();
     for (StackTraceElement ele : elements) {
       Class<?> clazz = Class.forName(ele.getClassName());
@@ -139,7 +141,7 @@ public class PublicUtils {
    * @param predicate 过滤条件
    * @return 符合过滤条件的成员字段列表
    */
-  public List<Field> getField(Class<?> clazz, Predicate<Field> predicate) {
+  public static List<Field> getField(Class<?> clazz, Predicate<Field> predicate) {
     Field[] fields = clazz.getDeclaredFields();
     return Arrays.stream(fields)
         .filter(predicate)
@@ -152,7 +154,7 @@ public class PublicUtils {
    * @param value 字符串
    * @return 包裹后的字符串
    */
-  public String wrapInDoubleQuotes(Object value) {
+  public static String wrapInDoubleQuotes(Object value) {
     return wrap(value, "\"");
   }
 
@@ -164,7 +166,7 @@ public class PublicUtils {
    * @param value 字符串
    * @return 去除后的字符串
    */
-  public String unwrapInDoubleQuotes(Object value) {
+  public static String unwrapInDoubleQuotes(Object value) {
     String str = Convert.toStr(value);
     if (str == null) {
       return null;
@@ -184,7 +186,7 @@ public class PublicUtils {
    * @param value 字符串
    * @return 包裹后的字符串
    */
-  public String wrapInCurlyBraces(Object value) {
+  public static String wrapInCurlyBraces(Object value) {
     return wrap(value, "{", "}");
   }
 
@@ -195,7 +197,7 @@ public class PublicUtils {
    * @param wrap  包裹字符串
    * @return 包裹后的字符串
    */
-  private String wrap(Object value, String wrap) {
+  private static String wrap(Object value, String wrap) {
     return wrap(value, wrap, wrap);
   }
 
@@ -207,7 +209,7 @@ public class PublicUtils {
    * @param rightWrap 尾部字符串
    * @return 包裹后的字符串
    */
-  private String wrap(Object value, String leftWrap, String rightWrap) {
+  private static String wrap(Object value, String leftWrap, String rightWrap) {
     String str = Convert.toStr(value, "");
     return leftWrap + str + rightWrap;
   }

@@ -1,8 +1,6 @@
 package com.zuminX.utils.builder;
 
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiMethod;
-import com.zuminX.annotations.swagger.ApiImplicitParams;
 import com.zuminX.annotations.swagger.ApiModel;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.utils.GeneratorUtils;

@@ -1,6 +1,5 @@
 package com.zuminX.actions;
 
-import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -8,9 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilBase;
-import com.zuminX.config.SystemSetting;
 import com.zuminX.service.Notify;
-import com.zuminX.settings.Settings;
 import com.zuminX.utils.GeneratorUtils;
 import com.zuminX.window.form.AnnotationForm;
 
@@ -38,7 +35,7 @@ public class GeneratorSwaggerAction extends AnAction {
     AnnotationForm.loadSettingsData();
 
     try {
-        GeneratorUtils.generate(psiFile, selectionText);
+      GeneratorUtils.generate(psiFile, selectionText);
     } catch (Exception e) {
       Notify.getInstance(project).error("generator.annotation.error.unknown");
       e.printStackTrace();

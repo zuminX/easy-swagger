@@ -2,9 +2,7 @@ package com.zuminX.utils.builder;
 
 import cn.hutool.core.convert.Convert;
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiMethod;
-import com.zuminX.annotations.swagger.ApiModelProperty;
 import com.zuminX.annotations.swagger.ApiOperation;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.names.SwaggerAnnotation;

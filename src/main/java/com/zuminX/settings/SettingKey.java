@@ -12,8 +12,6 @@ package com.zuminX.settings;
 
 import com.zuminX.config.SystemSetting;
 import com.zuminX.window.Option;
-import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -23,8 +21,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SettingKey<T> extends Key<T> {
 
-  @Getter
-  @Setter
   private Option option;
 
   public SettingKey(String name, T defaultData) {
@@ -49,5 +45,13 @@ public class SettingKey<T> extends Key<T> {
   public void setData(@NotNull T data) {
     Settings appSetting = SystemSetting.getInstance().getSetting();
     appSetting.putData(this, data);
+  }
+
+  public Option getOption() {
+    return this.option;
+  }
+
+  public void setOption(Option option) {
+    this.option = option;
   }
 }

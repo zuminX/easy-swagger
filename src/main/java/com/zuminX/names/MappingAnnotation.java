@@ -1,7 +1,5 @@
 package com.zuminX.names;
 
-import lombok.Getter;
-
 /**
  * Mapping注解类名
  */
@@ -23,7 +21,6 @@ public class MappingAnnotation extends ClassName {
     PUT_MAPPING = new MappingAnnotation("org.springframework.web.bind.annotation.PutMapping", "PUT");
   }
 
-  @Getter
   private final String type;
 
   public MappingAnnotation(String qualifiedName, String type) {
@@ -39,5 +36,9 @@ public class MappingAnnotation extends ClassName {
    */
   public static MappingAnnotation findByQualifiedName(String qualifiedName) {
     return ClassName.findByQualifiedName(qualifiedName);
+  }
+
+  public String getType() {
+    return this.type;
   }
 }

@@ -2,8 +2,6 @@ package com.zuminX.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -22,7 +20,6 @@ import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
-import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
@@ -42,21 +39,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * 生成Swagger注解的工具类
  */
-@UtilityClass
-public class GeneratorUtils {
+public final class GeneratorUtils {
+
+  private GeneratorUtils() {
+    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+  }
 
   /**
    * 根据所选择的内容生成对应的Swagger注解
    *
    * @param selectionText 选择的文本
    */
-  public void generate(PsiFile psiFile, String selectionText) {
+  public static void generate(PsiFile psiFile, String selectionText) {
     GeneratorPsi<PsiClass> generatorPsi = GeneratorPsi.build(psiFile);
     if (StrUtil.isBlank(selectionText)) {
       generate(() -> generateDefault(generatorPsi), generatorPsi);
@@ -73,7 +72,7 @@ public class GeneratorUtils {
    * @param psiElement Psi元素
    * @return 注释
    */
-  public String getFirstComment(PsiElement psiElement) {
+  public static String getFirstComment(PsiElement psiElement) {
     PsiComment comment = CollUtil.getFirst(getCommentByElement(psiElement.getChildren()));
     return comment != null ? CoreUtils.getCommentDesc(comment.getText()) : null;
   }
@@ -84,7 +83,7 @@ public class GeneratorUtils {
    * @param psiElement Psi元素数组
    * @return Psi注释列表
    */
-  public List<PsiComment> getCommentByElement(PsiElement[] psiElement) {
+  public static List<PsiComment> getCommentByElement(PsiElement[] psiElement) {
     return Arrays.stream(psiElement)
         .filter(child -> (child instanceof PsiComment))
         .map(child -> (PsiComment) child)
@@ -97,7 +96,7 @@ public class GeneratorUtils {
    * @param modifierListOwner Psi元素的修饰符列表
    * @return method属性值
    */
-  public String getMethodOfRequestMapping(PsiModifierListOwner modifierListOwner) {
+  public static String getMethodOfRequestMapping(PsiModifierListOwner modifierListOwner) {
     PsiAnnotation annotation = findRequestMapping(modifierListOwner);
     if (annotation == null) {
       return null;
@@ -123,7 +122,7 @@ public class GeneratorUtils {
    * @return val属性值
    */
   @Nullable
-  public String getValueOfRequestMapping(PsiModifierListOwner modifierListOwner) {
+  public static String getValueOfRequestMapping(PsiModifierListOwner modifierListOwner) {
     PsiAnnotation annotation = findRequestMapping(modifierListOwner);
     return annotation == null ? null : getTextOfAnnotationMemberValue(annotation, "value");
   }
@@ -135,7 +134,7 @@ public class GeneratorUtils {
    * @return RequestMapping注解对应的Psi注解
    */
   @Nullable
-  public PsiAnnotation findRequestMapping(PsiModifierListOwner modifierListOwner) {
+  public static PsiAnnotation findRequestMapping(PsiModifierListOwner modifierListOwner) {
     return Arrays.stream(modifierListOwner.getModifierList().getAnnotations())
         .filter(psiAnnotation -> MappingAnnotation.findByQualifiedName(psiAnnotation.getQualifiedName()) != null)
         .findAny()
@@ -150,7 +149,7 @@ public class GeneratorUtils {
    * @return 属性值
    */
   @Nullable
-  public String getTextOfAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
+  public static String getTextOfAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
     if (psiAnnotation == null) {
       return null;
     }
@@ -164,7 +163,7 @@ public class GeneratorUtils {
    * @param psiAnnotation 注解全路径
    * @param attributeName 注解属性名
    */
-  public List<String> getValueOfAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
+  public static List<String> getValueOfAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
     PsiAnnotationMemberValue psiAnnotationMemberValue = psiAnnotation.findDeclaredAttributeValue(attributeName);
     if (psiAnnotationMemberValue == null) {
       return ListUtil.empty();
@@ -181,7 +180,7 @@ public class GeneratorUtils {
   /**
    * 根据所选择的内容生成对应的Swagger注解
    */
-  public void generateSelection(String selectionText, GeneratorPsi<PsiClass> generatorPsi) {
+  public static void generateSelection(String selectionText, GeneratorPsi<PsiClass> generatorPsi) {
     PsiClass psiClass = generatorPsi.getElement();
     if (ObjectUtil.equals(selectionText, psiClass.getName())) {
       generateClassAnnotation(generatorPsi);
@@ -204,7 +203,7 @@ public class GeneratorUtils {
    * @param annotationStr 注解字符串对象
    * @param generatorPsi  生成注解的PSI元素
    */
-  public void doWrite(AnnotationStr annotationStr, GeneratorPsi<?> generatorPsi) {
+  public static void doWrite(AnnotationStr annotationStr, GeneratorPsi<?> generatorPsi) {
     ClassName className = annotationStr.getClassName();
     removeAnnotation(className.getQualifiedName(), generatorPsi.getElement());
     addImport(generatorPsi.getPsiFile(), className);
@@ -217,7 +216,7 @@ public class GeneratorUtils {
    * @param runnable     任务
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void generate(Runnable runnable, GeneratorPsi<PsiClass> generatorPsi) {
+  private static void generate(Runnable runnable, GeneratorPsi<PsiClass> generatorPsi) {
     if (generatorPsi.getElement().getModifierList() == null) {
       Notify.getInstance(generatorPsi.getProject()).error("generator.annotation.error.unableGenerate");
       return;
@@ -230,7 +229,7 @@ public class GeneratorUtils {
    *
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void generateDefault(GeneratorPsi<PsiClass> generatorPsi) {
+  private static void generateDefault(GeneratorPsi<PsiClass> generatorPsi) {
     PsiClass psiClass = generatorPsi.getElement();
     if (isController(psiClass)) {
       generateControllerClassAnnotation(generatorPsi);
@@ -248,7 +247,7 @@ public class GeneratorUtils {
    * @param name     方法名
    * @return Psi方法
    */
-  private PsiMethod findMethodByName(PsiClass psiClass, String name) {
+  private static PsiMethod findMethodByName(PsiClass psiClass, String name) {
     PsiMethod[] methods = psiClass.getMethods();
     return Arrays.stream(methods)
         .filter(psiMethod -> ObjectUtil.equals(name, psiMethod.getName()))
@@ -263,7 +262,7 @@ public class GeneratorUtils {
    * @param nameIdentifier 名称标识符
    * @return Psi字段
    */
-  private PsiField findFieldByNameIdentifier(PsiClass psiClass, String nameIdentifier) {
+  private static PsiField findFieldByNameIdentifier(PsiClass psiClass, String nameIdentifier) {
     PsiField[] fields = psiClass.getAllFields();
     return Arrays.stream(fields)
         .filter(psiField -> ObjectUtil.equals(nameIdentifier, psiField.getNameIdentifier().getText()))
@@ -277,7 +276,7 @@ public class GeneratorUtils {
    * @param qualifiedName        注解的全限定类名
    * @param psiModifierListOwner 当前写入对象
    */
-  private void removeAnnotation(String qualifiedName, PsiModifierListOwner psiModifierListOwner) {
+  private static void removeAnnotation(String qualifiedName, PsiModifierListOwner psiModifierListOwner) {
     PsiAnnotation annotation = psiModifierListOwner.getModifierList().findAnnotation(qualifiedName);
     if (annotation != null) {
       annotation.delete();
@@ -291,7 +290,7 @@ public class GeneratorUtils {
    * @param annotationText       注解内容
    * @param psiModifierListOwner 当前写入对象
    */
-  private void addAnnotation(String simpleName, String annotationText, PsiModifierListOwner psiModifierListOwner) {
+  private static void addAnnotation(String simpleName, String annotationText, PsiModifierListOwner psiModifierListOwner) {
     PsiAnnotation psiAnnotation = psiModifierListOwner.getModifierList().addAnnotation(simpleName);
     PsiAnnotation psiAnnotationDeclare = getPsiElementFactory(psiAnnotation).createAnnotationFromText(annotationText, psiModifierListOwner);
     PsiNameValuePair[] attributes = psiAnnotationDeclare.getParameterList().getAttributes();
@@ -304,9 +303,12 @@ public class GeneratorUtils {
    * @param psiClass Psi类
    * @return 若是controller则返回true，否则返回false
    */
-  private boolean isController(PsiClass psiClass) {
+  private static boolean isController(PsiClass psiClass) {
     PsiAnnotation[] psiAnnotations = psiClass.getModifierList().getAnnotations();
     List<ControllerAnnotation> controller = ControllerAnnotation.getAll();
+    if (StrUtil.endWith(psiClass.getName(), "Controller")) {
+      return true;
+    }
     return Arrays.stream(psiAnnotations)
         .anyMatch(psiAnnotation -> controller.stream()
             .anyMatch(className -> className.equals(psiAnnotation.getQualifiedName())));
@@ -317,7 +319,7 @@ public class GeneratorUtils {
    *
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void generateClassAnnotation(GeneratorPsi<PsiClass> generatorPsi) {
+  private static void generateClassAnnotation(GeneratorPsi<PsiClass> generatorPsi) {
     if (isController(generatorPsi.getElement())) {
       generateControllerClassAnnotation(generatorPsi);
     } else {
@@ -330,7 +332,7 @@ public class GeneratorUtils {
    *
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void generateControllerClassAnnotation(GeneratorPsi<PsiClass> generatorPsi) {
+  private static void generateControllerClassAnnotation(GeneratorPsi<PsiClass> generatorPsi) {
     ApiGenerator.INSTANCE.add(generatorPsi);
   }
 
@@ -339,7 +341,7 @@ public class GeneratorUtils {
    *
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void generateDomainClassAnnotation(GeneratorPsi<PsiClass> generatorPsi) {
+  private static void generateDomainClassAnnotation(GeneratorPsi<PsiClass> generatorPsi) {
     ApiModelGenerator.INSTANCE.add(generatorPsi);
   }
 
@@ -348,7 +350,7 @@ public class GeneratorUtils {
    *
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void generateMethodAnnotation(GeneratorPsi<PsiMethod> generatorPsi) {
+  private static void generateMethodAnnotation(GeneratorPsi<PsiMethod> generatorPsi) {
     generateMethodOperationAnnotation(generatorPsi);
     generateMethodParameterAnnotation(generatorPsi);
     addImport(generatorPsi.getPsiFile(), SwaggerAnnotation.API_IMPLICIT_PARAM);
@@ -359,7 +361,7 @@ public class GeneratorUtils {
    *
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void generateMethodOperationAnnotation(GeneratorPsi<PsiMethod> generatorPsi) {
+  private static void generateMethodOperationAnnotation(GeneratorPsi<PsiMethod> generatorPsi) {
     ApiOperationGenerator.INSTANCE.add(generatorPsi);
   }
 
@@ -368,7 +370,7 @@ public class GeneratorUtils {
    *
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void generateMethodParameterAnnotation(GeneratorPsi<PsiMethod> generatorPsi) {
+  private static void generateMethodParameterAnnotation(GeneratorPsi<PsiMethod> generatorPsi) {
     ApiImplicitParamsGenerator.INSTANCE.add(generatorPsi);
   }
 
@@ -377,7 +379,7 @@ public class GeneratorUtils {
    *
    * @param generatorPsi 生成注解的PSI元素
    */
-  private void generateFieldAnnotation(GeneratorPsi<PsiField> generatorPsi) {
+  private static void generateFieldAnnotation(GeneratorPsi<PsiField> generatorPsi) {
     ApiModelPropertyGenerator.INSTANCE.add(generatorPsi);
   }
 
@@ -387,7 +389,7 @@ public class GeneratorUtils {
    * @param file      当前文件对象
    * @param className 类名对象
    */
-  private void addImport(PsiFile file, ClassName className) {
+  private static void addImport(PsiFile file, ClassName className) {
     if (!(file instanceof PsiJavaFile)) {
       return;
     }
@@ -409,7 +411,7 @@ public class GeneratorUtils {
    * @return Psi类
    */
   @Nullable
-  private PsiClass getWantImportClass(Project project, ClassName className) {
+  private static PsiClass getWantImportClass(Project project, ClassName className) {
     PsiClass[] psiClasses = PsiShortNamesCache.getInstance(project).getClassesByName(className.getSimpleName(), GlobalSearchScope.allScope(project));
     return Arrays.stream(psiClasses)
         .filter(psiClass -> StrUtil.equals(psiClass.getQualifiedName(), className.getQualifiedName()))
@@ -424,13 +426,13 @@ public class GeneratorUtils {
    * @param qualifiedName 导入类的全限定类名
    * @return 若存在则返回true，不存在则返回false
    */
-  private boolean hasImportClass(PsiImportList importList, String qualifiedName) {
+  private static boolean hasImportClass(PsiImportList importList, String qualifiedName) {
     return Arrays.stream(importList.getAllImportStatements())
         .map(is -> is.getImportReference().getQualifiedName())
         .anyMatch(qualifiedName::equals);
   }
 
-  private PsiElementFactory getPsiElementFactory(PsiElement psiElement) {
+  private static PsiElementFactory getPsiElementFactory(PsiElement psiElement) {
     return JavaPsiFacade.getElementFactory(psiElement.getProject());
   }
 }

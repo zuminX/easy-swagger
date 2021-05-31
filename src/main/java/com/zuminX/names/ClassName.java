@@ -9,22 +9,20 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * 类名
  */
-@Getter
-@AllArgsConstructor
 public class ClassName {
 
   /**
    * 全限定类名
    */
   private final String qualifiedName;
+
+  public ClassName(String qualifiedName) {
+    this.qualifiedName = qualifiedName;
+  }
 
   /**
    * 获取指定Class的所有静态ClassName字段值
@@ -72,4 +70,7 @@ public class ClassName {
     return qualifiedName.equals(name);
   }
 
+  public String getQualifiedName() {
+    return this.qualifiedName;
+  }
 }

@@ -10,10 +10,9 @@
  */
 package com.zuminX.settings;
 
-import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.containers.IntObjectMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,14 +23,11 @@ import org.jetbrains.annotations.NotNull;
 public class Key<T> {
 
   private static final AtomicInteger OUR_KEYS_COUNTER = new AtomicInteger();
-  private static final IntObjectMap<Key<?>> ALL_KEYS = ContainerUtil.createConcurrentIntObjectWeakValueMap();
+  private static final Map<Integer, Key<?>> ALL_KEYS = new HashMap<>();
 
-  @Getter
   private final int index = OUR_KEYS_COUNTER.getAndIncrement();
 
-  @Getter
   private final String name;
-  @Getter
   private final T defaultData;
 
   protected Key(String name, T defaultData) {
@@ -46,7 +42,7 @@ public class Key<T> {
    * @return 以Map形式封装的所有键
    */
   @NotNull
-  public static IntObjectMap<Key<?>> getAllKeys() {
+  public static Map<Integer, Key<?>> getAllKeys() {
     return Key.ALL_KEYS;
   }
 
@@ -65,4 +61,15 @@ public class Key<T> {
     return this.name;
   }
 
+  public int getIndex() {
+    return this.index;
+  }
+
+  public String getName() {
+    return this.name;
+  }
+
+  public T getDefaultData() {
+    return this.defaultData;
+  }
 }

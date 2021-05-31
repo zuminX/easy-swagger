@@ -4,14 +4,16 @@ import cn.hutool.core.util.ClassLoaderUtil;
 import cn.hutool.core.util.ClassUtil;
 import com.zuminX.constant.SystemConstants;
 import java.util.Set;
-import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.StringUtils;
 
 /**
  * 核心工具类
  */
-@UtilityClass
-public class CoreUtils {
+public final class CoreUtils {
+
+  private CoreUtils() {
+    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+  }
 
   /**
    * 获取项目的所有实现clazz的Class
