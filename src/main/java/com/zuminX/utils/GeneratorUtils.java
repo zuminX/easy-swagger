@@ -205,7 +205,9 @@ public final class GeneratorUtils {
    */
   public static void doWrite(AnnotationStr annotationStr, GeneratorPsi<?> generatorPsi) {
     ClassName className = annotationStr.getClassName();
-    removeAnnotation(className.getQualifiedName(), generatorPsi.getElement());
+    if (existAnnotation(className.getQualifiedName(), generatorPsi.getElement())) {
+      return;
+    }
     addImport(generatorPsi.getPsiFile(), className);
     addAnnotation(className.getSimpleName(), annotationStr.toStr(), generatorPsi.getElement());
   }
@@ -271,16 +273,15 @@ public final class GeneratorUtils {
   }
 
   /**
-   * 删除指定注解
+   * 判断是否存在指定注解
    *
    * @param qualifiedName        注解的全限定类名
    * @param psiModifierListOwner 当前写入对象
+   * @return 若存在则返回true，否则返回false
    */
-  private static void removeAnnotation(String qualifiedName, PsiModifierListOwner psiModifierListOwner) {
+  private static boolean existAnnotation(String qualifiedName, PsiModifierListOwner psiModifierListOwner) {
     PsiAnnotation annotation = psiModifierListOwner.getModifierList().findAnnotation(qualifiedName);
-    if (annotation != null) {
-      annotation.delete();
-    }
+    return annotation != null;
   }
 
   /**

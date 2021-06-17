@@ -32,11 +32,12 @@ public class AnnotationForm extends OptionForm {
   public static void loadSettingsData() {
     for (Entry<String, List<AnnotationItem>> entry : ANNOTATION_SETTINGS.getData().getMap().entrySet()) {
       Class<?> clazz = Class.forName(entry.getKey());
+      int sort = 1;
       for (AnnotationItem annotationItem : entry.getValue()) {
         Field field = clazz.getDeclaredField(annotationItem.getName());
         AnnotationAttr annotation = AnnotationStr.getAnnotationAttr(field);
         AnnotationUtil.setValue(annotation, "defaultText", annotationItem.getDefaultText());
-        AnnotationUtil.setValue(annotation, "sort", annotationItem.getSort());
+        AnnotationUtil.setValue(annotation, "sort", sort++);
         AnnotationUtil.setValue(annotation, "show", annotationItem.getShow());
       }
     }
