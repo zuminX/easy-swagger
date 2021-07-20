@@ -46,6 +46,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class GeneratorUtils {
 
+  private static final String CONTROLLER = "Controller";
+
   private GeneratorUtils() {
     throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
   }
@@ -307,7 +309,7 @@ public final class GeneratorUtils {
   private static boolean isController(PsiClass psiClass) {
     PsiAnnotation[] psiAnnotations = psiClass.getModifierList().getAnnotations();
     List<ControllerAnnotation> controller = ControllerAnnotation.getAll();
-    if (StrUtil.endWith(psiClass.getName(), "Controller")) {
+    if (StrUtil.endWith(psiClass.getName(), CONTROLLER)) {
       return true;
     }
     return Arrays.stream(psiAnnotations)
