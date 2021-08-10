@@ -3,7 +3,9 @@ package com.zuminX.utils;
 import cn.hutool.core.util.ClassLoaderUtil;
 import cn.hutool.core.util.ClassUtil;
 import com.zuminX.constant.SystemConstants;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -32,61 +34,48 @@ public final class CoreUtils {
   }
 
   /**
-   * 获取注释说明
-   * <p/>
-   * 不写/@desc/@describe/@description
+   * 获取注释内容
    *
-   * @param comment 所有注释
-   * @return 注释
+   * @param comment 注释
+   * @return 注释内容
    */
   public static String getCommentDesc(String comment) {
-    String[] strings = comment.split("\n");
-    if (strings.length == 0) {
-      return "";
-    }
-    StringBuilder stringBuilder = new StringBuilder();
-    for (String string : strings) {
-      String row = StringUtils.deleteWhitespace(string);
-      if (StringUtils.isEmpty(row) || StringUtils.startsWith(row, "/**")) {
-        continue;
-      }
-      if (StringUtils.startsWithIgnoreCase(row, "*@desc")
-          && !StringUtils.startsWithIgnoreCase(row, "*@describe")
-          && !StringUtils.startsWithIgnoreCase(row, "*@description")) {
-        appendComment(string, stringBuilder, 5);
-      }
-      if (StringUtils.startsWithIgnoreCase(row, "*@description")) {
-        appendComment(string, stringBuilder, 12);
-      }
-      if (StringUtils.startsWithIgnoreCase(row, "*@describe")) {
-        appendComment(string, stringBuilder, 9);
-      }
-      if (StringUtils.startsWith(row, "*@") || StringUtils.startsWith(row, "*/")) {
-        continue;
-      }
-      int descIndex = StringUtils.ordinalIndexOf(string, "*", 1);
-      if (descIndex == -1) {
-        descIndex = StringUtils.ordinalIndexOf(string, "//", 1);
-        descIndex += 1;
-      }
-      String desc = string.substring(descIndex + 1);
-      stringBuilder.append(desc);
-    }
-    return StringUtils.trim(stringBuilder.toString());
+    return Arrays.stream(comment.split("\n"))
+        .map(StringUtils::deleteWhitespace)
+        .map(CoreUtils::removeCommentSymbol)
+        .filter(StringUtils::isNotEmpty)
+        .collect(Collectors.joining(" "));
   }
 
   /**
-   * 追加注释
+   * 删除注释符号
    *
-   * @param s     字符串
-   * @param sb    字符串构建对象
-   * @param index 下标
+   * @param origin 待处理的字符串
+   * @return 移除注释符号的字符串
    */
-  private static void appendComment(String s, StringBuilder sb, int index) {
-    String lowerCaseStr = s.toLowerCase();
-    int descIndex = StringUtils.ordinalIndexOf(lowerCaseStr, "@", 1);
-    descIndex += index;
-    String desc = s.substring(descIndex);
-    sb.append(desc);
+  private static String removeCommentSymbol(String origin) {
+    if (origin.isEmpty()) {
+      return "";
+    }
+    int start = 0, end = origin.length() - 1;
+    while (start <= end) {
+      char c = origin.charAt(start);
+      if (c == '*' || c == '/' || c == ' ') {
+        ++start;
+        continue;
+      }
+      if (c == '@') {
+        return "";
+      }
+      break;
+    }
+    while (start <= end) {
+      char c = origin.charAt(end);
+      if (c != '*' && c != '/' && c != ' ') {
+        break;
+      }
+      --end;
+    }
+    return origin.substring(start, end + 1);
   }
 }
