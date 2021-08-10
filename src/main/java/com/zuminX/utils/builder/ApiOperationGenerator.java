@@ -1,6 +1,5 @@
 package com.zuminX.utils.builder;
 
-import cn.hutool.core.convert.Convert;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiMethod;
 import com.zuminX.annotations.swagger.ApiOperation;
@@ -15,7 +14,7 @@ public class ApiOperationGenerator implements AnnotationGenerator<PsiMethod, Api
   public final ApiOperation build(PsiMethod psiMethod) {
     PsiAnnotation apiOperationExist = psiMethod.getModifierList().findAnnotation(SwaggerAnnotation.API_OPERATION.getQualifiedName());
     return ApiOperation.builder()
-        .value(getValue(apiOperationExist))
+        .value(getValue(psiMethod))
         .notes(getNotes(apiOperationExist))
         .httpMethod(getHttpMethod(psiMethod)).build();
   }
@@ -28,8 +27,8 @@ public class ApiOperationGenerator implements AnnotationGenerator<PsiMethod, Api
     return GeneratorUtils.getTextOfAnnotationMemberValue(apiOperationExist, "notes");
   }
 
-  protected String getValue(PsiAnnotation apiOperationExist) {
-    return Convert.toStr(GeneratorUtils.getTextOfAnnotationMemberValue(apiOperationExist, "value"), "");
+  protected String getValue(PsiMethod psiMethod) {
+    return GeneratorUtils.getFirstComment(psiMethod);
   }
 
 }

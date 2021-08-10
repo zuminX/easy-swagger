@@ -13,7 +13,7 @@ public class ApiImplicitParam extends AnnotationStr {
   @AnnotationAttr(show = true)
   private String name;
 
-  @AnnotationAttr
+  @AnnotationAttr(show = true)
   private String value;
 
   @AnnotationAttr(show = true)

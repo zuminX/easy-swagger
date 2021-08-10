@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -146,6 +147,17 @@ public final class PublicUtils {
     return Arrays.stream(fields)
         .filter(predicate)
         .collect(Collectors.toList());
+  }
+
+  /**
+   * 检查目标字符串中是否至少含有指定集合中字符串的一个
+   *
+   * @param target      待检查的字符串
+   * @param allowString 期望出现的字符串
+   * @return 若至少出现一次则返回true，否则返回false
+   */
+  public static boolean containsAny(String target, Set<String> allowString) {
+    return allowString.stream().anyMatch(s -> StringUtils.contains(target, s));
   }
 
   /**

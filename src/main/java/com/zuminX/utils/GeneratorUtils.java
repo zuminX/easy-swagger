@@ -20,6 +20,7 @@ import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
@@ -75,6 +76,10 @@ public final class GeneratorUtils {
    * @return 注释
    */
   public static String getFirstComment(PsiElement psiElement) {
+    if (PublicUtils.isAssignable(PsiParameter.class, psiElement.getClass())) {
+      PsiElement comment = psiElement.getParent().getParent();
+      return comment != null ? CoreUtils.getParamComment(comment.getText(), ((PsiParameter) psiElement).getNameIdentifier().getText()) : null;
+    }
     PsiComment comment = CollUtil.getFirst(getCommentByElement(psiElement.getChildren()));
     return comment != null ? CoreUtils.getCommentDesc(comment.getText()) : null;
   }

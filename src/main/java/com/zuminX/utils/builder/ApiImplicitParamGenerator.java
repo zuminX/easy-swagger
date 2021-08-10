@@ -1,10 +1,12 @@
 package com.zuminX.utils.builder;
 
 import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.zuminX.annotations.swagger.ApiImplicitParam;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.names.RequestAnnotation;
+import com.zuminX.utils.GeneratorUtils;
 import com.zuminX.utils.PublicUtils;
 import java.util.Arrays;
 import java.util.Objects;
@@ -18,7 +20,7 @@ public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParamet
         .paramType(getParamType(psiParameter))
         .dataType(getDataType(psiParameter))
         .name(getName(psiParameter))
-        .value("")
+        .value(getValue(psiParameter))
         .build();
   }
 
@@ -38,6 +40,10 @@ public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParamet
         .findAny()
         .map(RequestAnnotation::getType)
         .orElse(null);
+  }
+
+  protected String getValue(PsiParameter psiParameter) {
+    return GeneratorUtils.getFirstComment(psiParameter);
   }
 
 }
