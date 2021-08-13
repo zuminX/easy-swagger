@@ -122,6 +122,8 @@ public abstract class AnnotationStr {
           continue;
         }
         content = wrapInCurlyBraces(listToStr((List<Object>) value));
+      } else if (value instanceof ClassName) {
+        content = ((ClassName) value).getSimpleName() + ".class";
       } else {
         content = wrapInDoubleQuotes(value);
       }
@@ -170,7 +172,7 @@ public abstract class AnnotationStr {
     if (clazz == List.class) {
       return wrapInCurlyBraces("");
     }
-    if (clazz == Class.class) {
+    if (clazz == ClassName.class) {
       return "Void.class";
     }
     return wrapInDoubleQuotes("");

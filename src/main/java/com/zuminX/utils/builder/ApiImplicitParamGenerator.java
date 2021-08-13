@@ -1,15 +1,17 @@
 package com.zuminX.utils.builder;
 
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.zuminX.annotations.swagger.ApiImplicitParam;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
+import com.zuminX.names.ClassName;
 import com.zuminX.names.RequestAnnotation;
 import com.zuminX.utils.GeneratorUtils;
 import com.zuminX.utils.PublicUtils;
 import java.util.Arrays;
 import java.util.Objects;
+import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 
 public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParameter, ApiImplicitParam> {
 
@@ -19,6 +21,7 @@ public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParamet
     return ApiImplicitParam.builder()
         .paramType(getParamType(psiParameter))
         .dataType(getDataType(psiParameter))
+        .dataTypeClass(getDataTypeClass(psiParameter))
         .name(getName(psiParameter))
         .value(getValue(psiParameter))
         .build();
@@ -29,7 +32,12 @@ public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParamet
   }
 
   protected String getDataType(PsiParameter psiParameter) {
-    return PublicUtils.getSimpleNameByQualifiedName(psiParameter.getType().getCanonicalText());
+    return PublicUtils.getSimpleNameByQualifiedName(getParameterType(psiParameter));
+  }
+
+  @SneakyThrows
+  protected ClassName getDataTypeClass(PsiParameter psiParameter) {
+    return new ClassName(getParameterType(psiParameter));
   }
 
   protected String getParamType(PsiParameter psiParameter) {
@@ -44,6 +52,11 @@ public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParamet
 
   protected String getValue(PsiParameter psiParameter) {
     return GeneratorUtils.getFirstComment(psiParameter);
+  }
+
+  @NotNull
+  private String getParameterType(PsiParameter psiParameter) {
+    return psiParameter.getType().getCanonicalText();
   }
 
 }

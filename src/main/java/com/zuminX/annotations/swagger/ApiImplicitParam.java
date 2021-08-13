@@ -35,7 +35,7 @@ public class ApiImplicitParam extends AnnotationStr {
   private String dataType;
 
   @AnnotationAttr(show = true)
-  private Class<?> dataTypeClass;
+  private ClassName dataTypeClass;
 
   @AnnotationAttr
   private String paramType;
@@ -59,7 +59,7 @@ public class ApiImplicitParam extends AnnotationStr {
   private String collectionFormat;
 
   public ApiImplicitParam(String name, String value, String defaultValue, String allowableValues, Boolean required, String access, Boolean allowMultiple,
-      String dataType, Class<?> dataTypeClass, String paramType, String example, String type, String format, Boolean allowEmptyValue, Boolean readOnly,
+      String dataType, ClassName dataTypeClass, String paramType, String example, String type, String format, Boolean allowEmptyValue, Boolean readOnly,
       String collectionFormat) {
     this.name = name;
     this.value = value;
@@ -123,7 +123,7 @@ public class ApiImplicitParam extends AnnotationStr {
     return this.dataType;
   }
 
-  public Class<?> getDataTypeClass() {
+  public ClassName getDataTypeClass() {
     return this.dataTypeClass;
   }
 
@@ -187,7 +187,7 @@ public class ApiImplicitParam extends AnnotationStr {
     this.dataType = dataType;
   }
 
-  public void setDataTypeClass(Class<?> dataTypeClass) {
+  public void setDataTypeClass(ClassName dataTypeClass) {
     this.dataTypeClass = dataTypeClass;
   }
 
@@ -376,7 +376,7 @@ public class ApiImplicitParam extends AnnotationStr {
     private String access;
     private Boolean allowMultiple;
     private String dataType;
-    private Class<?> dataTypeClass;
+    private ClassName dataTypeClass;
     private String paramType;
     private String example;
     private String type;
@@ -428,7 +428,7 @@ public class ApiImplicitParam extends AnnotationStr {
       return this;
     }
 
-    public ApiImplicitParamBuilder dataTypeClass(Class<?> dataTypeClass) {
+    public ApiImplicitParamBuilder dataTypeClass(ClassName dataTypeClass) {
       this.dataTypeClass = dataTypeClass;
       return this;
     }
