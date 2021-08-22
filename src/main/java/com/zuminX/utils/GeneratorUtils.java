@@ -38,6 +38,7 @@ import com.zuminX.utils.builder.ApiModelPropertyGenerator;
 import com.zuminX.utils.builder.ApiOperationGenerator;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
@@ -212,9 +213,6 @@ public final class GeneratorUtils {
    */
   public static void doWrite(AnnotationStr annotationStr, GeneratorPsi<?> generatorPsi) {
     ClassName className = annotationStr.getClassName();
-    if (existAnnotation(className.getQualifiedName(), generatorPsi.getElement())) {
-      return;
-    }
     addImport(generatorPsi.getPsiFile(), className);
     addAnnotation(className.getSimpleName(), annotationStr.toStr(), generatorPsi.getElement());
   }
@@ -280,18 +278,6 @@ public final class GeneratorUtils {
   }
 
   /**
-   * 判断是否存在指定注解
-   *
-   * @param qualifiedName        注解的全限定类名
-   * @param psiModifierListOwner 当前写入对象
-   * @return 若存在则返回true，否则返回false
-   */
-  private static boolean existAnnotation(String qualifiedName, PsiModifierListOwner psiModifierListOwner) {
-    PsiAnnotation annotation = psiModifierListOwner.getModifierList().findAnnotation(qualifiedName);
-    return annotation != null;
-  }
-
-  /**
    * 添加注解
    *
    * @param simpleName           注解的简单类名
@@ -299,10 +285,46 @@ public final class GeneratorUtils {
    * @param psiModifierListOwner 当前写入对象
    */
   private static void addAnnotation(String simpleName, String annotationText, PsiModifierListOwner psiModifierListOwner) {
-    PsiAnnotation psiAnnotation = psiModifierListOwner.getModifierList().addAnnotation(simpleName);
+    PsiAnnotation psiAnnotation = findAnnotationByName(simpleName, psiModifierListOwner);
+    if (psiAnnotation == null) {
+      psiAnnotation = psiModifierListOwner.getModifierList().addAnnotation(simpleName);
+    }
     PsiAnnotation psiAnnotationDeclare = getPsiElementFactory(psiAnnotation).createAnnotationFromText(annotationText, psiModifierListOwner);
     PsiNameValuePair[] attributes = psiAnnotationDeclare.getParameterList().getAttributes();
-    Arrays.stream(attributes).forEach(pair -> psiAnnotation.setDeclaredAttributeValue(pair.getName(), pair.getValue()));
+    //TODO 无法支持多重注解
+    Map<String, PsiAnnotationMemberValue> map = getAnnotationNameToValue(psiAnnotation);
+    for (PsiNameValuePair pair : attributes) {
+      if (!map.containsKey(pair.getName())) {
+        psiAnnotation.setDeclaredAttributeValue(pair.getName(), pair.getValue());
+      }
+    }
+  }
+
+  /**
+   * 通过名称找到对应的注释
+   *
+   * @param name                 注解名称
+   * @param psiModifierListOwner 当前写入对象
+   * @return Psi注解
+   */
+  private static PsiAnnotation findAnnotationByName(String name, PsiModifierListOwner psiModifierListOwner) {
+    PsiAnnotation[] annotations = psiModifierListOwner.getModifierList().getAnnotations();
+    return Arrays.stream(annotations)
+        .filter(annotation -> name.equals(PublicUtils.getSimpleNameByQualifiedName(annotation.getQualifiedName())))
+        .findFirst()
+        .orElse(null);
+  }
+
+  /**
+   * 获取指定注解的属性的名称到值的映射
+   *
+   * @param psiAnnotation Psi注解
+   * @return 注解中属性的名称到值的映射
+   */
+  private static Map<String, PsiAnnotationMemberValue> getAnnotationNameToValue(PsiAnnotation psiAnnotation) {
+    //TODO 对于多重注解，其Key为null，值为注解字符串
+    return Arrays.stream(psiAnnotation.getParameterList().getAttributes())
+        .collect(Collectors.toMap(PsiNameValuePair::getName, PsiNameValuePair::getValue, (a, b) -> b));
   }
 
   /**
@@ -440,6 +462,12 @@ public final class GeneratorUtils {
         .anyMatch(qualifiedName::equals);
   }
 
+  /**
+   * 根据Psi元素获取Psi元素工厂
+   *
+   * @param psiElement Psi元素
+   * @return Psi元素工厂
+   */
   private static PsiElementFactory getPsiElementFactory(PsiElement psiElement) {
     return JavaPsiFacade.getElementFactory(psiElement.getProject());
   }
