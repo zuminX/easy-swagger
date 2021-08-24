@@ -14,17 +14,15 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * 公共工具类
  */
-public final class PublicUtils {
-
-  private PublicUtils() {
-    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-  }
+@UtilityClass
+public class PublicUtils {
 
   public static Set<Class<?>> findClassReferenced(Class<?> clazz, Predicate<Class<?>> predicate) {
     Set<Class<?>> result = new HashSet<>();

@@ -7,20 +7,18 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang.StringUtils;
 
 /**
  * 核心工具类
  */
-public final class CoreUtils {
+@UtilityClass
+public class CoreUtils {
 
   private static final Set<String> DESCRIPTION_NAME = Set.of("desc", "describe", "description");
 
   private static final Set<String> PARAM_NAME = Set.of("param");
-
-  private CoreUtils() {
-    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-  }
 
   /**
    * 获取项目的所有实现clazz的Class

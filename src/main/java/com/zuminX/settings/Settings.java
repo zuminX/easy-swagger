@@ -84,7 +84,6 @@ public class Settings {
       return;
     }
     setting.properties.forEach(this.properties::put);
-    //TODO 临时解决setting无法持久化的问题
     SystemSetting.getInstance().setSetting(this);
   }
 
@@ -129,7 +128,7 @@ public class Settings {
     if (settings == null) {
       return false;
     }
-    return settings.properties.entrySet().stream().anyMatch(entry -> !ObjectUtil.equals(entry.getValue(), this.properties.get(entry.getKey())));
+    return settings.properties.entrySet().stream().anyMatch(entry -> ObjectUtil.notEqual(entry.getValue(), this.properties.get(entry.getKey())));
   }
 
   /**

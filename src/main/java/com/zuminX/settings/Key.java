@@ -13,6 +13,7 @@ package com.zuminX.settings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <T> 值类型
  */
+@Getter
 public class Key<T> {
 
   private static final AtomicInteger OUR_KEYS_COUNTER = new AtomicInteger();
@@ -59,17 +61,5 @@ public class Key<T> {
   @Override
   public String toString() {
     return this.name;
-  }
-
-  public int getIndex() {
-    return this.index;
-  }
-
-  public String getName() {
-    return this.name;
-  }
-
-  public T getDefaultData() {
-    return this.defaultData;
   }
 }

@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
@@ -37,22 +38,23 @@ import com.zuminX.utils.builder.ApiModelGenerator;
 import com.zuminX.utils.builder.ApiModelPropertyGenerator;
 import com.zuminX.utils.builder.ApiOperationGenerator;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * 生成Swagger注解的工具类
  */
-public final class GeneratorUtils {
+@UtilityClass
+public class GeneratorUtils {
 
   private static final String CONTROLLER = "Controller";
 
-  private GeneratorUtils() {
-    throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-  }
+  private static final String NAME = "name";
 
   /**
    * 根据所选择的内容生成对应的Swagger注解
@@ -291,12 +293,33 @@ public final class GeneratorUtils {
     }
     PsiAnnotation psiAnnotationDeclare = getPsiElementFactory(psiAnnotation).createAnnotationFromText(annotationText, psiModifierListOwner);
     PsiNameValuePair[] attributes = psiAnnotationDeclare.getParameterList().getAttributes();
-    //TODO 无法支持多重注解
     Map<String, PsiAnnotationMemberValue> map = getAnnotationNameToValue(psiAnnotation);
+    if (map == null) {
+      return;
+    }
     for (PsiNameValuePair pair : attributes) {
-      if (!map.containsKey(pair.getName())) {
-        psiAnnotation.setDeclaredAttributeValue(pair.getName(), pair.getValue());
+      String name = pair.getName();
+      if (map.containsKey(name) && name != null) {
+        continue;
       }
+      PsiAnnotationMemberValue value = pair.getValue();
+      if (value instanceof PsiArrayInitializerMemberValue && map.get(name) != null) {
+        Map<String, Map<String, PsiAnnotationMemberValue>> multipleAnnotationsMap = resolveMultipleAnnotations((PsiArrayInitializerMemberValue) map.get(null));
+        for (PsiAnnotationMemberValue initializer : ((PsiArrayInitializerMemberValue) value).getInitializers()) {
+          PsiNameValuePair[] psiNameValuePairs = ((PsiAnnotation) initializer).getParameterList().getAttributes();
+          PsiAnnotationMemberValue memberValue = findAnnotationMemberValueByName(psiNameValuePairs, NAME);
+          if (memberValue == null) {
+            continue;
+          }
+          Map<String, PsiAnnotationMemberValue> memberValueMap = multipleAnnotationsMap.get(memberValue.getText());
+          if (memberValueMap == null) {
+            continue;
+          }
+          Arrays.stream(psiNameValuePairs).forEach(psiNameValuePair -> ((PsiAnnotation) initializer).setDeclaredAttributeValue(psiNameValuePair.getName(),
+              memberValueMap.getOrDefault(psiNameValuePair.getName(), psiNameValuePair.getValue())));
+        }
+      }
+      psiAnnotation.setDeclaredAttributeValue(name, value);
     }
   }
 
@@ -322,9 +345,40 @@ public final class GeneratorUtils {
    * @return 注解中属性的名称到值的映射
    */
   private static Map<String, PsiAnnotationMemberValue> getAnnotationNameToValue(PsiAnnotation psiAnnotation) {
-    //TODO 对于多重注解，其Key为null，值为注解字符串
     return Arrays.stream(psiAnnotation.getParameterList().getAttributes())
         .collect(Collectors.toMap(PsiNameValuePair::getName, PsiNameValuePair::getValue, (a, b) -> b));
+  }
+
+  /**
+   * 解析多重注解
+   *
+   * @param memberValue Psi数组成员
+   * @return key为注解的name属性的值，value为注解中属性的名称到值的映射
+   */
+  private static Map<String, Map<String, PsiAnnotationMemberValue>> resolveMultipleAnnotations(PsiArrayInitializerMemberValue memberValue) {
+    PsiAnnotationMemberValue[] initializers = memberValue.getInitializers();
+    Map<String, Map<String, PsiAnnotationMemberValue>> result = new HashMap<>();
+    Arrays.stream(initializers).filter(initializer -> initializer instanceof PsiAnnotation).forEach(initializer -> {
+      PsiNameValuePair[] psiNameValuePairs = ((PsiAnnotation) initializer).getParameterList().getAttributes();
+      PsiAnnotationMemberValue value = findAnnotationMemberValueByName(psiNameValuePairs, NAME);
+      if (value != null) {
+        result.put(value.getText(), getAnnotationNameToValue((PsiAnnotation) initializer));
+      }
+    });
+    return result;
+  }
+
+  /**
+   * 寻找注解中指定名称的成员
+   *
+   * @param psiNameValuePairs Psi名称值对数组
+   * @param name              名称
+   * @return Psi注解属性成员
+   */
+  private static PsiAnnotationMemberValue findAnnotationMemberValueByName(PsiNameValuePair[] psiNameValuePairs, String name) {
+    return Arrays.stream(psiNameValuePairs)
+        .filter(pair -> name.equals(pair.getName()))
+        .findAny().map(pair -> pair.getValue()).orElse(null);
   }
 
   /**

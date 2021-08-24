@@ -5,12 +5,14 @@ import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
 /**
  * 通知类
  */
+@AllArgsConstructor
 public class Notify {
 
   private static final NotificationGroup NOTIFICATION_GROUP;
@@ -20,10 +22,6 @@ public class Notify {
   }
 
   private final Project project;
-
-  private Notify(@NotNull Project project) {
-    this.project = project;
-  }
 
   /**
    * 获取实例对象

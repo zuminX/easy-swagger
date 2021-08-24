@@ -5,10 +5,12 @@ import com.zuminX.window.OptionForm;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JComponent;
+import lombok.Getter;
 
 /**
  * 设置项
  */
+@Getter
 public class SettingItem {
 
   private final List<Option> options;
@@ -33,13 +35,5 @@ public class SettingItem {
       form.addOptionItem((JComponent) option);
     }
     return this;
-  }
-
-  public List<Option> getOptions() {
-    return this.options;
-  }
-
-  public OptionForm getForm() {
-    return this.form;
   }
 }
