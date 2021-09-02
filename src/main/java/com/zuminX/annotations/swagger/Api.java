@@ -37,6 +37,9 @@ public class Api extends AnnotationStr {
   private String protocols;
 
   @AnnotationAttr
+  private List<Authorization> authorizations;
+
+  @AnnotationAttr
   private Boolean hidden;
 
   @Override

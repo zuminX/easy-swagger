@@ -216,7 +216,7 @@ public class GeneratorUtils {
   public static void doWrite(AnnotationStr annotationStr, GeneratorPsi<?> generatorPsi) {
     ClassName className = annotationStr.getClassName();
     addImport(generatorPsi.getPsiFile(), className);
-    addAnnotation(className.getSimpleName(), annotationStr.toStr(), generatorPsi.getElement());
+    updateAnnotation(className.getSimpleName(), annotationStr.toStr(), generatorPsi.getElement());
   }
 
   /**
@@ -280,29 +280,29 @@ public class GeneratorUtils {
   }
 
   /**
-   * 添加注解
+   * 更新注解
    *
    * @param simpleName           注解的简单类名
    * @param annotationText       注解内容
    * @param psiModifierListOwner 当前写入对象
    */
-  private static void addAnnotation(String simpleName, String annotationText, PsiModifierListOwner psiModifierListOwner) {
+  private static void updateAnnotation(String simpleName, String annotationText, PsiModifierListOwner psiModifierListOwner) {
     PsiAnnotation psiAnnotation = findAnnotationByName(simpleName, psiModifierListOwner);
     if (psiAnnotation == null) {
       psiAnnotation = psiModifierListOwner.getModifierList().addAnnotation(simpleName);
     }
     PsiAnnotation psiAnnotationDeclare = getPsiElementFactory(psiAnnotation).createAnnotationFromText(annotationText, psiModifierListOwner);
-    PsiNameValuePair[] attributes = psiAnnotationDeclare.getParameterList().getAttributes();
     Map<String, PsiAnnotationMemberValue> map = getAnnotationNameToValue(psiAnnotation);
     if (map == null) {
       return;
     }
-    for (PsiNameValuePair pair : attributes) {
+    for (PsiNameValuePair pair : psiAnnotationDeclare.getParameterList().getAttributes()) {
       String name = pair.getName();
       if (map.containsKey(name) && name != null) {
         continue;
       }
       PsiAnnotationMemberValue value = pair.getValue();
+      // 处理多重注解
       if (value instanceof PsiArrayInitializerMemberValue && map.get(name) != null) {
         Map<String, Map<String, PsiAnnotationMemberValue>> multipleAnnotationsMap = resolveMultipleAnnotations((PsiArrayInitializerMemberValue) map.get(null));
         for (PsiAnnotationMemberValue initializer : ((PsiArrayInitializerMemberValue) value).getInitializers()) {
@@ -358,13 +358,15 @@ public class GeneratorUtils {
   private static Map<String, Map<String, PsiAnnotationMemberValue>> resolveMultipleAnnotations(PsiArrayInitializerMemberValue memberValue) {
     PsiAnnotationMemberValue[] initializers = memberValue.getInitializers();
     Map<String, Map<String, PsiAnnotationMemberValue>> result = new HashMap<>();
-    Arrays.stream(initializers).filter(initializer -> initializer instanceof PsiAnnotation).forEach(initializer -> {
-      PsiNameValuePair[] psiNameValuePairs = ((PsiAnnotation) initializer).getParameterList().getAttributes();
-      PsiAnnotationMemberValue value = findAnnotationMemberValueByName(psiNameValuePairs, NAME);
-      if (value != null) {
-        result.put(value.getText(), getAnnotationNameToValue((PsiAnnotation) initializer));
-      }
-    });
+    Arrays.stream(initializers)
+        .filter(initializer -> initializer instanceof PsiAnnotation)
+        .forEach(initializer -> {
+          PsiNameValuePair[] psiNameValuePairs = ((PsiAnnotation) initializer).getParameterList().getAttributes();
+          PsiAnnotationMemberValue value = findAnnotationMemberValueByName(psiNameValuePairs, NAME);
+          if (value != null) {
+            result.put(value.getText(), getAnnotationNameToValue((PsiAnnotation) initializer));
+          }
+        });
     return result;
   }
 

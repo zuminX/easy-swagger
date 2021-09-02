@@ -31,7 +31,7 @@ public class ApiOperation extends AnnotationStr {
   private List<String> tags;
 
   @AnnotationAttr
-  private Class<?> response;
+  private ClassName response;
 
   @AnnotationAttr
   private String responseContainer;
@@ -55,10 +55,19 @@ public class ApiOperation extends AnnotationStr {
   private String protocols;
 
   @AnnotationAttr
+  private List<Authorization> authorizations;
+
+  @AnnotationAttr
   private Boolean hidden;
 
   @AnnotationAttr
+  private List<ResponseHeader> responseHeaders;
+
+  @AnnotationAttr(defaultText = "200")
   private Integer code;
+
+  @AnnotationAttr
+  private List<Extension> extensions;
 
   @AnnotationAttr
   private Boolean ignoreJsonView;

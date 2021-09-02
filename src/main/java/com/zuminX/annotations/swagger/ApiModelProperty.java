@@ -4,6 +4,7 @@ import com.zuminX.annotations.AnnotationAttr;
 import com.zuminX.annotations.AnnotationStr;
 import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,7 +39,7 @@ public class ApiModelProperty extends AnnotationStr {
   @AnnotationAttr
   private String dataType;
 
-  @AnnotationAttr(show = true)
+  @AnnotationAttr(show = true, defaultText = "true")
   private Boolean required;
 
   @AnnotationAttr
@@ -55,6 +56,9 @@ public class ApiModelProperty extends AnnotationStr {
 
   @AnnotationAttr
   private Boolean allowEmptyValue;
+
+  @AnnotationAttr
+  private List<Extension> extensions;
 
   @Override
   public ClassName getClassName() {

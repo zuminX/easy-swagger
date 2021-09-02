@@ -21,17 +21,20 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class ApiModel extends AnnotationStr {
 
+  @AnnotationAttr
+  private String value;
+
   @AnnotationAttr(show = true)
   private String description;
 
   @AnnotationAttr
-  private Class<?> parent;
+  private ClassName parent;
 
   @AnnotationAttr
   private String discriminator;
 
   @AnnotationAttr
-  private List<Class<?>> subTypes;
+  private List<ClassName> subTypes;
 
   @AnnotationAttr
   private String reference;

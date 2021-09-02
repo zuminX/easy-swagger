@@ -152,7 +152,15 @@ public abstract class AnnotationStr {
    */
   private String listToStr(List<Object> value) {
     return value.stream()
-        .map(object -> PublicUtils.isNumOrBool(object) ? object.toString() : wrapInDoubleQuotes(object))
+        .map(object -> {
+          if (PublicUtils.isNumOrBool(object)) {
+            return object.toString();
+          }
+          if (object instanceof ClassName) {
+            return ((ClassName) object).getSimpleName() + ".class";
+          }
+          return wrapInDoubleQuotes(object);
+        })
         .collect(Collectors.joining(", "));
   }
 

@@ -4,6 +4,7 @@ import com.zuminX.annotations.AnnotationAttr;
 import com.zuminX.annotations.AnnotationStr;
 import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,6 +53,9 @@ public class ApiImplicitParam extends AnnotationStr {
 
   @AnnotationAttr
   private String example;
+
+  @AnnotationAttr
+  private List<Example> examples;
 
   @AnnotationAttr
   private String type;

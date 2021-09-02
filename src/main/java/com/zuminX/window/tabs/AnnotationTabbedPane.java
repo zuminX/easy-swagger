@@ -28,10 +28,13 @@ public class AnnotationTabbedPane extends JBTabbedPane implements Option {
 
   private final Map<String, AnnotationTable> table = new HashMap<>();
 
-  public AnnotationTabbedPane(SettingKey<AnnotationSettings> settingKey) {
-    this.settingKey = settingKey;
+  private final Map<String, List<AnnotationItem>> defaultMap;
 
-    this.settingKey.getData().getMap().forEach((key, value) -> {
+  public AnnotationTabbedPane(SettingKey<AnnotationSettings> settingKey, Map<String, List<AnnotationItem>> defaultMap) {
+    this.settingKey = settingKey;
+    this.defaultMap = defaultMap;
+
+    settingKey.getData().getFullMap(defaultMap).forEach((key, value) -> {
       AnnotationTableModel model = new AnnotationTableModel(value);
       AnnotationTable jbTable = new AnnotationTable(model);
 
@@ -46,27 +49,13 @@ public class AnnotationTabbedPane extends JBTabbedPane implements Option {
   }
 
   /**
-   * 获取默认项
-   *
-   * @return 注解设置信息
-   */
-  @SneakyThrows
-  public static AnnotationSettings getDefaultItems() {
-    Map<String, List<AnnotationItem>> map = new HashMap<>();
-    for (Class<?> clazz : CoreUtils.getClasses(AnnotationStr.class)) {
-      map.put(clazz.getName(), getAnnotationItemList((AnnotationStr) clazz.getConstructor().newInstance()));
-    }
-    return new AnnotationSettings(map);
-  }
-
-  /**
    * 显示设置
    *
    * @param setting 设置信息
    */
   @Override
   public void showSetting(@NotNull Settings setting) {
-    setting.getData(settingKey).getMap().forEach((key, value) -> {
+    setting.getData(settingKey).getFullMap(defaultMap).forEach((key, value) -> {
       AnnotationTable table = this.table.get(key);
       table.setItemList(value);
     });
@@ -82,18 +71,5 @@ public class AnnotationTabbedPane extends JBTabbedPane implements Option {
     Map<String, List<AnnotationItem>> map = new HashMap<>();
     table.forEach((key, value) -> map.put(key, value.getItemList()));
     setting.putData(settingKey, new AnnotationSettings(map));
-  }
-
-  /**
-   * 根据注解字符串类获取注解设置信息列表
-   *
-   * @param annotationStr 注解字符串对象
-   * @return 注解设置信息列表
-   */
-  private static List<AnnotationItem> getAnnotationItemList(AnnotationStr annotationStr) {
-    return AnnotationStr.getSortFields(annotationStr).stream().map(field -> {
-      AnnotationAttr annotationAttr = AnnotationStr.getAnnotationAttr(field);
-      return new AnnotationItem(field.getName(), annotationAttr.defaultText(), annotationAttr.sort(), annotationAttr.show());
-    }).collect(Collectors.toList());
   }
 }

@@ -19,6 +19,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ClassName {
 
+  public static final ClassName OBJECT_CLASS_NAME = new ClassName("java.lang.Object");
   /**
    * 全限定类名
    */
