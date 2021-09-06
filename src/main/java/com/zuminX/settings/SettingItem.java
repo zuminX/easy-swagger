@@ -2,8 +2,8 @@ package com.zuminX.settings;
 
 import com.zuminX.window.Option;
 import com.zuminX.window.OptionForm;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JComponent;
 import lombok.Getter;
 
@@ -13,12 +13,16 @@ import lombok.Getter;
 @Getter
 public class SettingItem {
 
-  private final List<Option> options;
+  private final List<Option> options = new ArrayList<>();
 
   private final OptionForm form;
 
+  /**
+   * 该类的构造方法
+   *
+   * @param form 选项表单
+   */
   public SettingItem(OptionForm form) {
-    options = new CopyOnWriteArrayList<>();
     this.form = form;
   }
 

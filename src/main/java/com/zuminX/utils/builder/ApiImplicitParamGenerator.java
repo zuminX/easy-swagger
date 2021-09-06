@@ -1,6 +1,9 @@
 package com.zuminX.utils.builder;
 
+import cn.hutool.core.bean.OptionalBean;
 import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiIdentifier;
+import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiParameter;
 import com.zuminX.annotations.swagger.ApiImplicitParam;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
@@ -10,13 +13,21 @@ import com.zuminX.utils.GeneratorUtils;
 import com.zuminX.utils.PublicUtils;
 import java.util.Arrays;
 import java.util.Objects;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * ApiImplicitParam注解的生成器类
+ */
 public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParameter, ApiImplicitParam> {
 
   public static final ApiImplicitParamGenerator INSTANCE = AnnotationGeneratorInterceptor.create(ApiImplicitParamGenerator.class, ApiImplicitParam.class);
 
+  /**
+   * 根据psi参数对象构建ApiImplicitParam注解对象
+   *
+   * @param psiParameter psi参数
+   * @return ApiImplicitParam注解对象
+   */
   public final ApiImplicitParam build(PsiParameter psiParameter) {
     return ApiImplicitParam.builder()
         .paramType(getParamType(psiParameter))
@@ -27,21 +38,48 @@ public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParamet
         .build();
   }
 
+  /**
+   * 从psi参数对象中获取ApiImplicitParam类的name属性
+   *
+   * @param psiParameter psi参数
+   * @return ApiImplicitParam类的name属性
+   */
   protected String getName(PsiParameter psiParameter) {
-    return psiParameter.getNameIdentifier().getText();
+    return OptionalBean.ofNullable(psiParameter.getNameIdentifier()).getBean(PsiIdentifier::getText).get();
   }
 
+  /**
+   * 从psi参数对象中获取ApiImplicitParam类的dataType属性
+   *
+   * @param psiParameter psi参数
+   * @return ApiImplicitParam类的dataType属性
+   */
   protected String getDataType(PsiParameter psiParameter) {
     return PublicUtils.getSimpleNameByQualifiedName(getParameterType(psiParameter));
   }
 
-  @SneakyThrows
+  /**
+   * 从psi参数对象中获取ApiImplicitParam类的dataTypeClass属性
+   *
+   * @param psiParameter psi参数
+   * @return ApiImplicitParam类的dataTypeClass属性
+   */
   protected ClassName getDataTypeClass(PsiParameter psiParameter) {
     return new ClassName(getParameterType(psiParameter));
   }
 
+  /**
+   * 从psi参数对象中获取ApiImplicitParam类的paramType属性
+   *
+   * @param psiParameter psi参数
+   * @return ApiImplicitParam类的paramType属性
+   */
   protected String getParamType(PsiParameter psiParameter) {
-    return Arrays.stream(psiParameter.getModifierList().getAnnotations())
+    PsiModifierList modifierList = psiParameter.getModifierList();
+    if (modifierList == null) {
+      return null;
+    }
+    return Arrays.stream(modifierList.getAnnotations())
         .map(PsiAnnotation::getQualifiedName)
         .map(RequestAnnotation::findByQualifiedName)
         .filter(Objects::nonNull)
@@ -50,11 +88,22 @@ public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParamet
         .orElse(null);
   }
 
+  /**
+   * 从psi参数对象中获取ApiImplicitParam类的value属性
+   *
+   * @param psiParameter psi参数
+   * @return ApiImplicitParam类的value属性
+   */
   protected String getValue(PsiParameter psiParameter) {
     return GeneratorUtils.getFirstComment(psiParameter);
   }
 
-  @NotNull
+  /**
+   * 从psi参数对象中获取ApiImplicitParam类的parameterType属性
+   *
+   * @param psiParameter psi参数
+   * @return ApiImplicitParam类的parameterType属性
+   */
   private String getParameterType(PsiParameter psiParameter) {
     return psiParameter.getType().getCanonicalText();
   }

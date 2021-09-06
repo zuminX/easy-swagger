@@ -11,6 +11,7 @@
 package com.zuminX.settings;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zuminX.config.SystemSetting;
 import com.zuminX.utils.CoreUtils;
@@ -47,9 +48,8 @@ public class Settings {
   @SneakyThrows
   public static List<SettingItem> getAllSettingItems() {
     List<SettingItem> options = new ArrayList<>();
-
     for (Class<?> declaredClass : CoreUtils.getClasses(OptionForm.class)) {
-      OptionForm instance = (OptionForm) declaredClass.getConstructor().newInstance();
+      OptionForm instance = (OptionForm) ReflectUtil.newInstance(declaredClass);
       SettingItem item = new SettingItem(instance);
       for (Field field : declaredClass.getDeclaredFields()) {
         if (!field.getType().equals(SettingKey.class)) {
@@ -69,7 +69,6 @@ public class Settings {
       }
       options.add(item);
     }
-
     options.sort(Comparator.comparingInt(o -> o.getForm().getSort()));
     return options;
   }
@@ -83,7 +82,7 @@ public class Settings {
     if (setting == null) {
       return;
     }
-    setting.properties.forEach(this.properties::put);
+    this.properties.putAll(setting.properties);
     SystemSetting.getInstance().setSetting(this);
   }
 
@@ -95,6 +94,7 @@ public class Settings {
    * @return 数据
    */
   @SneakyThrows
+  @SuppressWarnings("unchecked")
   public <T> T getData(@NotNull SettingKey<T> key) {
     String value = properties.get(key.getName());
     T defaultValue = key.getDefaultData();

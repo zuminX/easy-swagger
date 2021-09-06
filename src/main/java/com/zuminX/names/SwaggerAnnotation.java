@@ -35,6 +35,11 @@ public class SwaggerAnnotation extends ClassName {
     RESPONSE_HEADER = new SwaggerAnnotation("io.swagger.annotations.ResponseHeader");
   }
 
+  /**
+   * 该类的构造方法
+   *
+   * @param qualifiedName 全限定类名
+   */
   public SwaggerAnnotation(String qualifiedName) {
     super(qualifiedName);
   }

@@ -11,10 +11,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * ApiImplicitParams注解的生成器类
+ */
 public class ApiImplicitParamsGenerator implements AnnotationGenerator<PsiMethod, AnnotationStr> {
 
   public static final ApiImplicitParamsGenerator INSTANCE = AnnotationGeneratorInterceptor.create(ApiImplicitParamsGenerator.class, ApiImplicitParams.class);
 
+  /**
+   * 根据psi方法对象构建注解字符串对象
+   *
+   * @param psiMethod psi方法
+   * @return 注解字符串对象
+   */
   public final AnnotationStr build(PsiMethod psiMethod) {
     // 根据方法的参数个数选择生成的注解类型
     int parametersCount = psiMethod.getParameterList().getParametersCount();
@@ -35,6 +44,12 @@ public class ApiImplicitParamsGenerator implements AnnotationGenerator<PsiMethod
     return ApiImplicitParams.builder().value(getValue(psiParameters)).build();
   }
 
+  /**
+   * 从psi参数数组中获取ApiImplicitParams类的value属性
+   *
+   * @param psiParameters psi参数数组
+   * @return ApiImplicitParams类的value属性
+   */
   protected List<ApiImplicitParam> getValue(PsiParameter[] psiParameters) {
     return Arrays.stream(psiParameters)
         .map(ApiImplicitParamGenerator.INSTANCE::build)

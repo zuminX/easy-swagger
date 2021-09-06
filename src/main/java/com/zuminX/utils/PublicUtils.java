@@ -24,25 +24,6 @@ import org.jetbrains.annotations.NotNull;
 @UtilityClass
 public class PublicUtils {
 
-  public static Set<Class<?>> findClassReferenced(Class<?> clazz, Predicate<Class<?>> predicate) {
-    Set<Class<?>> result = new HashSet<>();
-    if (predicate.test(clazz)) {
-      result.add(clazz);
-    }
-    Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
-      Type typeArgument = TypeUtil.getTypeArgument(field.getGenericType());
-      if (typeArgument != null) {
-        if (predicate.test((Class<?>) typeArgument)) {
-          result.add((Class<?>) typeArgument);
-        }
-      }
-      if (predicate.test(field.getType())) {
-        result.add(field.getType());
-      }
-    });
-    return result;
-  }
-
   /**
    * 判断value对象是否为数字或布尔值
    *
@@ -82,6 +63,7 @@ public class PublicUtils {
    * @return 该字段的值
    */
   @SneakyThrows
+  @SuppressWarnings("unchecked")
   public static <T> T getStaticFieldValue(@NotNull Field field) {
     if (!isStatic(field)) {
       return null;
@@ -111,6 +93,7 @@ public class PublicUtils {
    * @param <T>   父类类型
    * @return Class对象
    */
+  @SuppressWarnings("unchecked")
   public static <T> Class<? extends T> getCallSubclass(Class<T> clazz) {
     return (Class<? extends T>) getCallClass(callClazz -> callClazz.getSuperclass() == clazz);
   }

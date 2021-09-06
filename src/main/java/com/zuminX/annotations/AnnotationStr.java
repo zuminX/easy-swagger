@@ -123,7 +123,7 @@ public abstract class AnnotationStr {
         }
         content = wrapInCurlyBraces(listToStr((List<Object>) value));
       } else if (value instanceof ClassName) {
-        content = ((ClassName) value).getSimpleName() + ".class";
+        content = ((ClassName) value).getClassName();
       } else {
         content = wrapInDoubleQuotes(value);
       }
@@ -157,7 +157,7 @@ public abstract class AnnotationStr {
             return object.toString();
           }
           if (object instanceof ClassName) {
-            return ((ClassName) object).getSimpleName() + ".class";
+            return ((ClassName) object).getClassName();
           }
           return wrapInDoubleQuotes(object);
         })

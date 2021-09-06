@@ -1,5 +1,6 @@
 package com.zuminX.window.tabs.domain;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.zuminX.annotations.AnnotationAttr;
 import com.zuminX.annotations.AnnotationStr;
 import com.zuminX.annotations.swagger.Api;
@@ -22,7 +23,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
 
 /**
  * 注解设置信息类
@@ -32,8 +32,7 @@ import lombok.SneakyThrows;
 public class AnnotationSettings {
 
   private static final List<Class<? extends AnnotationStr>> MAIN_ANNOTATIONS = List.of(Api.class, ApiImplicitParam.class, ApiImplicitParams.class,
-      ApiModel.class,
-      ApiModelProperty.class, ApiOperation.class);
+      ApiModel.class, ApiModelProperty.class, ApiOperation.class);
   public static final Map<String, List<AnnotationItem>> MAIN_ANNOTATION_DEFAULT_MAP = getMapByClassList(MAIN_ANNOTATIONS);
   private static final List<Class<? extends AnnotationStr>> PROPERTY_ANNOTATIONS = List.of(Authorization.class, AuthorizationScope.class, Example.class,
       ExampleProperty.class, Extension.class, ExtensionProperty.class, ResponseHeader.class);
@@ -43,18 +42,13 @@ public class AnnotationSettings {
   private Map<String, List<AnnotationItem>> map;
 
   /**
-   * 获取属性注解的默认项
+   * 获取注解设置信息的默认项
    *
    * @param list 注解Class列表
    * @return 默认项
    */
-  @SneakyThrows
   private static Map<String, List<AnnotationItem>> getMapByClassList(List<Class<? extends AnnotationStr>> list) {
-    Map<String, List<AnnotationItem>> map = new HashMap<>();
-    for (Class<?> clazz : list) {
-      map.put(clazz.getName(), getAnnotationItemList((AnnotationStr) clazz.getConstructor().newInstance()));
-    }
-    return map;
+    return list.stream().collect(Collectors.toMap(Class::getName, clazz -> getAnnotationItemList(ReflectUtil.newInstance(clazz)), (a, b) -> b));
   }
 
   /**
@@ -73,7 +67,8 @@ public class AnnotationSettings {
   /**
    * 获取完整的注解设置信息
    *
-   * @return key为设置名，value设置项
+   * @param defaultMap 注解设置信息的默认项
+   * @return key为注解名，value为注解项集合的映射
    */
   public Map<String, List<AnnotationItem>> getFullMap(Map<String, List<AnnotationItem>> defaultMap) {
     // TODO 临时解决始终使用旧设置信息的问题

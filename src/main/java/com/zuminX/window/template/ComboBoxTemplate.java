@@ -63,6 +63,7 @@ public class ComboBoxTemplate<T> extends JPanel implements Option {
   }
 
   @Nullable
+  @SuppressWarnings("unchecked")
   public final T getSelectItem() {
     return (T) comboBox.getSelectedItem();
   }

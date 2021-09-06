@@ -15,6 +15,11 @@ public class ControllerAnnotation extends ClassName {
     REST_CONTROLLER = new ControllerAnnotation("org.springframework.web.bind.annotation.RestController");
   }
 
+  /**
+   * 该类的构造方法
+   *
+   * @param qualifiedName 全限定类名
+   */
   public ControllerAnnotation(String qualifiedName) {
     super(qualifiedName);
   }

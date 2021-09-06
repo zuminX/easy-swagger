@@ -32,6 +32,12 @@ public class Key<T> {
   private final String name;
   private final T defaultData;
 
+  /**
+   * 该类的构造方法
+   *
+   * @param name        名称
+   * @param defaultData 默认值
+   */
   protected Key(String name, T defaultData) {
     this.name = name;
     this.defaultData = defaultData;

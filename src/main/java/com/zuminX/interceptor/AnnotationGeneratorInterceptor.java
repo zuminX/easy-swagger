@@ -3,7 +3,7 @@ package com.zuminX.interceptor;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.zuminX.annotations.AnnotationStr;
-import com.zuminX.domain.GeneratorPsi;
+import com.zuminX.domain.ProjectPsi;
 import com.zuminX.utils.GeneratorUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -30,6 +30,7 @@ public class AnnotationGeneratorInterceptor implements MethodInterceptor {
    * @param <T>             生成器类
    * @return 生成器对象
    */
+  @SuppressWarnings("unchecked")
   public static <T> T create(Class<T> target, Class<? extends AnnotationStr> annotationClazz) {
     AnnotationGeneratorInterceptor interceptor = new AnnotationGeneratorInterceptor(annotationClazz);
     return (T) interceptor.cglibProxyGenerator(target);
@@ -53,7 +54,7 @@ public class AnnotationGeneratorInterceptor implements MethodInterceptor {
     }
     Object result = methodProxy.invokeSuper(o, objects);
     if (name.equals("add") && result != null) {
-      GeneratorUtils.doWrite((AnnotationStr) result, (GeneratorPsi<?>) objects[0]);
+      GeneratorUtils.doWrite((AnnotationStr) result, (ProjectPsi<?>) objects[0]);
     }
     return result;
   }
@@ -76,7 +77,6 @@ public class AnnotationGeneratorInterceptor implements MethodInterceptor {
    * @return 动态代理类
    */
   private Object cglibProxyGenerator(Class<?> target) {
-    // 创建加强类，用来创建动态代理类
     Enhancer enhancer = new Enhancer();
     enhancer.setSuperclass(target);
     enhancer.setCallback(this);

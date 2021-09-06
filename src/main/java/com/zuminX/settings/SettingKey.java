@@ -27,6 +27,12 @@ public class SettingKey<T> extends Key<T> {
   @Setter
   private Option option;
 
+  /**
+   * 该类的构造方法
+   *
+   * @param name        名称
+   * @param defaultData 默认值
+   */
   public SettingKey(String name, T defaultData) {
     super(name, defaultData);
   }

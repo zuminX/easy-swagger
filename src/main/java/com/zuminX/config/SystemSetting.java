@@ -74,7 +74,6 @@ public class SystemSetting implements PersistentStateComponent<SystemSetting> {
    */
   @Override
   public void loadState(@NotNull SystemSetting state) {
-    //TODO 更新设置项后，会被原始的设置覆盖
     XmlSerializerUtil.copyBean(state, this);
   }
 }

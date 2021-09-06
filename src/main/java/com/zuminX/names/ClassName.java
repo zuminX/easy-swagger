@@ -45,6 +45,7 @@ public class ClassName {
    * @param <T>           ClassName字段的实际类型
    * @return 指定类名的静态ClassName字段值
    */
+  @SuppressWarnings("unchecked")
   public static <T extends ClassName> T findByQualifiedName(String qualifiedName) {
     if (StrUtil.isBlank(qualifiedName)) {
       return null;
@@ -59,6 +60,15 @@ public class ClassName {
    */
   public String getSimpleName() {
     return PublicUtils.getSimpleNameByQualifiedName(qualifiedName);
+  }
+
+  /**
+   * 获取当前类名对象的带.class后缀名称
+   *
+   * @return 带.class后缀名称
+   */
+  public String getClassName() {
+    return getSimpleName() + ".class";
   }
 
   /**

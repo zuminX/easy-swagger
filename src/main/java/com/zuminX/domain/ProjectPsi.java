@@ -9,24 +9,24 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 生成Swagger注解的PSI元素
+ * 携带项目信息的psi元素类
  *
- * @param <T>
+ * @param <T> psi元素类型
  */
 @Getter
 @AllArgsConstructor
-public class GeneratorPsi<T extends PsiModifierListOwner> {
+public class ProjectPsi<T extends PsiModifierListOwner> {
 
   private final PsiFile psiFile;
 
   private final T element;
 
-  public static GeneratorPsi<PsiClass> build(PsiFile psiFile) {
-    return new GeneratorPsi<>(psiFile, PsiTreeUtil.findChildOfAnyType(psiFile, PsiClass.class));
+  public static ProjectPsi<PsiClass> build(PsiFile psiFile) {
+    return new ProjectPsi<>(psiFile, PsiTreeUtil.findChildOfAnyType(psiFile, PsiClass.class));
   }
 
-  public <V extends PsiModifierListOwner> GeneratorPsi<V> replace(V element) {
-    return new GeneratorPsi<V>(psiFile, element);
+  public <V extends PsiModifierListOwner> ProjectPsi<V> replace(V element) {
+    return new ProjectPsi<V>(psiFile, element);
   }
 
   public Project getProject() {

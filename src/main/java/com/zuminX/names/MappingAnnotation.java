@@ -26,6 +26,12 @@ public class MappingAnnotation extends ClassName {
   @Getter
   private final String type;
 
+  /**
+   * 该类的构造方法
+   *
+   * @param qualifiedName 全限定类名
+   * @param type          请求类型
+   */
   public MappingAnnotation(String qualifiedName, String type) {
     super(qualifiedName);
     this.type = type;

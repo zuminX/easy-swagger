@@ -28,10 +28,10 @@ public class CoreUtils {
    */
   public static Set<Class<?>> getClasses(Class<?> clazz) {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    // 替换类加载器，以确保能正确扫描到项目的Class
     Thread.currentThread().setContextClassLoader(ClassLoaderUtil.class.getClassLoader());
-
     Set<Class<?>> result = ClassUtil.scanPackageBySuper(SystemConstants.PROJECT_PACKAGE_NAME, clazz);
-
+    // 还原设置的类加载器
     Thread.currentThread().setContextClassLoader(contextClassLoader);
     return result;
   }

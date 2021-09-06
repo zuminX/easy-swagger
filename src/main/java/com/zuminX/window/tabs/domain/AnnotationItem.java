@@ -19,4 +19,5 @@ public class AnnotationItem {
   private Integer sort;
 
   private Boolean show;
+
 }
