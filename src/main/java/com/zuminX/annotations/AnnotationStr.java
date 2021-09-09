@@ -4,8 +4,10 @@ import static com.zuminX.utils.PublicUtils.wrapInCurlyBraces;
 import static com.zuminX.utils.PublicUtils.wrapInDoubleQuotes;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
+import com.zuminX.enums.AnnotationEnum;
 import com.zuminX.names.ClassName;
 import com.zuminX.utils.PublicUtils;
 import java.lang.reflect.Field;
@@ -124,6 +126,8 @@ public abstract class AnnotationStr {
         content = wrapInCurlyBraces(listToStr((List<Object>) value));
       } else if (value instanceof ClassName) {
         content = ((ClassName) value).getClassName();
+      } else if (value instanceof AnnotationEnum) {
+        content = ((AnnotationEnum) value).getExpression();
       } else {
         content = wrapInDoubleQuotes(value);
       }
@@ -159,6 +163,9 @@ public abstract class AnnotationStr {
           if (object instanceof ClassName) {
             return ((ClassName) object).getClassName();
           }
+          if (object instanceof AnnotationEnum) {
+            return ((AnnotationEnum) object).getExpression();
+          }
           return wrapInDoubleQuotes(object);
         })
         .collect(Collectors.joining(", "));
@@ -182,6 +189,9 @@ public abstract class AnnotationStr {
     }
     if (clazz == ClassName.class) {
       return "Void.class";
+    }
+    if (PublicUtils.isAssignable(AnnotationEnum.class, clazz)) {
+      return ((AnnotationEnum) ReflectUtil.newInstance(clazz.getName())).getDefault().getExpression();
     }
     return wrapInDoubleQuotes("");
   }

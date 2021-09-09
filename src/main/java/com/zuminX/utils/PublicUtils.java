@@ -2,13 +2,10 @@ package com.zuminX.utils;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.TypeUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -23,6 +20,16 @@ import org.jetbrains.annotations.NotNull;
  */
 @UtilityClass
 public class PublicUtils {
+
+  /**
+   * 连接多个字符串为一个
+   *
+   * @param strs 字符串数组
+   * @return 连接后的字符串
+   */
+  public static String concat(CharSequence... strs) {
+    return StrUtil.concat(true, strs);
+  }
 
   /**
    * 判断value对象是否为数字或布尔值

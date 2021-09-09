@@ -2,6 +2,7 @@ package com.zuminX.annotations.swagger;
 
 import com.zuminX.annotations.AnnotationAttr;
 import com.zuminX.annotations.AnnotationStr;
+import com.zuminX.enums.AccessMode;
 import com.zuminX.names.ClassName;
 import com.zuminX.names.SwaggerAnnotation;
 import java.util.List;
@@ -50,6 +51,9 @@ public class ApiModelProperty extends AnnotationStr {
 
   @AnnotationAttr
   private String example;
+
+  @AnnotationAttr
+  private AccessMode accessMode;
 
   @AnnotationAttr
   private String reference;

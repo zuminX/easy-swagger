@@ -10,10 +10,11 @@
         3.The ability to set whether to generate specified annotations and default values via the Settings-Tools-Easy Swagger page.<br>
         4.The annotation information can be obtained from the Javadoc and written to the value attribute of the Swagger annotation.<br>
     ]]></description>
-  <version>1.2.2</version>
+  <version>1.2.3</version>
 
   <change-notes><![CDATA[
       <ul>
+        <li> Increase the ApiModelProperty.AccessMode property, increase the judgment of the null pointer </li>
         <li> Improve the attributes of Swagger annotations </li>
         <li> Support incremental generation </li>
         <li> Fix the problem that the data Type Class attribute cannot be read </li>
