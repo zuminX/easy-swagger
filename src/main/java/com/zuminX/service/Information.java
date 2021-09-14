@@ -1,7 +1,7 @@
 package com.zuminX.service;
 
 import com.intellij.AbstractBundle;
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.application.ApplicationManager;
 import org.jetbrains.annotations.PropertyKey;
 
 /**
@@ -32,7 +32,7 @@ public class Information extends AbstractBundle {
    * @return 信息类对象
    */
   private static Information getInstance() {
-    return ServiceManager.getService(Information.class);
+    return ApplicationManager.getApplication().getService(Information.class);
   }
 
 }

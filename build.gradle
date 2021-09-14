@@ -7,14 +7,14 @@ group 'com.github.zuminX'
 version '1.2.3'
 
 repositories {
-    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
     maven { url 'https://maven.aliyun.com/repository/public/' }
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
     mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    implementation 'cn.hutool:hutool-core:5.6.7'
+    implementation 'cn.hutool:hutool-core:5.7.11'
 
     compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'

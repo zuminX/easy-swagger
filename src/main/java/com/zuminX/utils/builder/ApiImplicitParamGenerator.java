@@ -9,11 +9,10 @@ import com.zuminX.annotations.swagger.ApiImplicitParam;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.names.ClassName;
 import com.zuminX.names.RequestAnnotation;
-import com.zuminX.utils.GeneratorUtils;
+import com.zuminX.utils.PsiUtils;
 import com.zuminX.utils.PublicUtils;
 import java.util.Arrays;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * ApiImplicitParam注解的生成器类
@@ -95,7 +94,7 @@ public class ApiImplicitParamGenerator implements AnnotationGenerator<PsiParamet
    * @return ApiImplicitParam类的value属性
    */
   protected String getValue(PsiParameter psiParameter) {
-    return GeneratorUtils.getFirstComment(psiParameter);
+    return PsiUtils.getFirstComment(psiParameter);
   }
 
   /**

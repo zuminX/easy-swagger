@@ -4,6 +4,7 @@ import com.intellij.psi.PsiClass;
 import com.zuminX.annotations.swagger.Api;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.utils.GeneratorUtils;
+import com.zuminX.utils.PsiUtils;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class ApiGenerator implements AnnotationGenerator<PsiClass, Api> {
    * @return Api类的tags属性
    */
   protected List<String> getTags(PsiClass psiClass) {
-    String comment = GeneratorUtils.getFirstComment(psiClass);
+    String comment = PsiUtils.getFirstComment(psiClass);
     return comment == null ? null : Collections.singletonList(comment);
   }
 }

@@ -3,7 +3,6 @@ package com.zuminX.service;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,7 @@ public class Notify {
    * @return 通知类对象
    */
   public static Notify getInstance(@NotNull Project project) {
-    return ServiceManager.getService(project, Notify.class);
+    return project.getService(Notify.class);
   }
 
   /**

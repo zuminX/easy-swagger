@@ -1,32 +1,21 @@
 package com.zuminX.utils;
 
-import cn.hutool.core.bean.OptionalBean;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiArrayInitializerMemberValue;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiComment;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiImportList;
-import com.intellij.psi.PsiJavaCodeReferenceElement;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiModifierListOwner;
 import com.intellij.psi.PsiNameValuePair;
-import com.intellij.psi.PsiParameter;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.zuminX.annotations.AnnotationStr;
@@ -45,8 +34,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,40 +62,6 @@ public class GeneratorUtils {
   }
 
   /**
-   * 从Psi元素中获取注释
-   * <p>
-   * 若存在多个注释，则选取第一个
-   *
-   * @param psiElement Psi元素
-   * @return 注释
-   */
-  public static String getFirstComment(PsiElement psiElement) {
-    if (PublicUtils.isAssignable(PsiParameter.class, psiElement.getClass())) {
-      PsiElement comment = psiElement.getParent().getParent();
-      PsiIdentifier nameIdentifier = ((PsiParameter) psiElement).getNameIdentifier();
-      if (comment == null || nameIdentifier == null) {
-        return null;
-      }
-      return CoreUtils.getParamComment(comment.getText(), nameIdentifier.getText());
-    }
-    PsiComment comment = CollUtil.getFirst(getCommentByElement(psiElement.getChildren()));
-    return comment != null ? CoreUtils.getCommentDesc(comment.getText()) : null;
-  }
-
-  /**
-   * 从Psi元素中获取注释
-   *
-   * @param psiElement Psi元素数组
-   * @return Psi注释列表
-   */
-  public static List<PsiComment> getCommentByElement(PsiElement[] psiElement) {
-    return Arrays.stream(psiElement)
-        .filter(child -> (child instanceof PsiComment))
-        .map(child -> (PsiComment) child)
-        .collect(Collectors.toList());
-  }
-
-  /**
    * 获取RequestMapping注解中的method属性值
    *
    * @param modifierListOwner Psi元素的修饰符列表
@@ -123,7 +76,7 @@ public class GeneratorUtils {
     if (!MappingAnnotation.REQUEST_MAPPING.equals(mapping)) {
       return mapping.getType();
     }
-    List<String> values = getValueOfAnnotationMemberValue(annotation, "method");
+    List<String> values = PsiUtils.getValueOfAnnotationMemberValue(annotation, "method");
     if (values.isEmpty()) {
       return null;
     }
@@ -142,7 +95,7 @@ public class GeneratorUtils {
   @Nullable
   public static String getValueOfRequestMapping(PsiModifierListOwner modifierListOwner) {
     PsiAnnotation annotation = findRequestMapping(modifierListOwner);
-    return annotation == null ? null : getTextOfAnnotationMemberValue(annotation, "value");
+    return annotation == null ? null : PsiUtils.getTextOfAnnotationMemberValue(annotation, "value");
   }
 
   /**
@@ -164,42 +117,6 @@ public class GeneratorUtils {
   }
 
   /**
-   * 获取注解属性文本
-   *
-   * @param psiAnnotation 注解全路径
-   * @param attributeName 注解属性名
-   * @return 属性值
-   */
-  @Nullable
-  public static String getTextOfAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
-    if (psiAnnotation == null) {
-      return null;
-    }
-    PsiAnnotationMemberValue psiAnnotationMemberValue = psiAnnotation.findDeclaredAttributeValue(attributeName);
-    return psiAnnotationMemberValue == null ? null : PublicUtils.unwrapInDoubleQuotes(psiAnnotationMemberValue.getText());
-  }
-
-  /**
-   * 获取注解属性值
-   *
-   * @param psiAnnotation 注解全路径
-   * @param attributeName 注解属性名
-   */
-  public static List<String> getValueOfAnnotationMemberValue(PsiAnnotation psiAnnotation, String attributeName) {
-    PsiAnnotationMemberValue psiAnnotationMemberValue = psiAnnotation.findDeclaredAttributeValue(attributeName);
-    if (psiAnnotationMemberValue == null) {
-      return ListUtil.empty();
-    }
-    //获取实际类型：((ClsEnumConstantImpl) resolve).getStub().getType(false).toString()
-    return Arrays.stream(psiAnnotationMemberValue.getChildren())
-        .flatMap(child -> Arrays.stream(child.getReferences()))
-        .map(PsiReference::resolve)
-        .filter(Objects::nonNull)
-        .map(PsiElement::getText)
-        .collect(Collectors.toList());
-  }
-
-  /**
    * 根据所选择的内容生成对应的Swagger注解
    */
   public static void generateSelection(String selectionText, ProjectPsi<PsiClass> projectPsi) {
@@ -208,15 +125,17 @@ public class GeneratorUtils {
       generateClassAnnotation(projectPsi);
       return;
     }
-    PsiMethod method = findMethodByName(psiClass, selectionText);
+    PsiMethod method = PsiUtils.findMethodByName(psiClass, selectionText);
     if (method != null) {
       generateMethodAnnotation(projectPsi.replace(method));
       return;
     }
-    PsiField field = findFieldByNameIdentifier(psiClass, selectionText);
+    PsiField field = PsiUtils.findFieldByNameIdentifier(psiClass, selectionText);
     if (field != null) {
       generateFieldAnnotation(projectPsi.replace(field));
+      return;
     }
+    Notify.getInstance(projectPsi.getProject()).warning("generator.annotation.warning.chooseIllegal");
   }
 
   /**
@@ -262,36 +181,6 @@ public class GeneratorUtils {
   }
 
   /**
-   * 从Psi类中获取指定名称的Psi方法
-   *
-   * @param psiClass Psi类
-   * @param name     方法名
-   * @return Psi方法
-   */
-  private static PsiMethod findMethodByName(PsiClass psiClass, String name) {
-    PsiMethod[] methods = psiClass.getMethods();
-    return Arrays.stream(methods)
-        .filter(psiMethod -> ObjectUtil.equals(name, psiMethod.getName()))
-        .findFirst()
-        .orElse(null);
-  }
-
-  /**
-   * 从Psi类中获取指定名称标识符的Psi字段
-   *
-   * @param psiClass       Psi类
-   * @param nameIdentifier 名称标识符
-   * @return Psi字段
-   */
-  private static PsiField findFieldByNameIdentifier(PsiClass psiClass, String nameIdentifier) {
-    PsiField[] fields = psiClass.getAllFields();
-    return Arrays.stream(fields)
-        .filter(psiField -> ObjectUtil.equals(nameIdentifier, psiField.getNameIdentifier().getText()))
-        .findFirst()
-        .orElse(null);
-  }
-
-  /**
    * 更新注解
    *
    * @param simpleName           注解的简单类名
@@ -303,12 +192,12 @@ public class GeneratorUtils {
     if (modifierList == null) {
       return;
     }
-    PsiAnnotation psiAnnotation = findAnnotationByName(simpleName, psiModifierListOwner);
+    PsiAnnotation psiAnnotation = PsiUtils.findAnnotationByName(simpleName, psiModifierListOwner);
     if (psiAnnotation == null) {
       psiAnnotation = modifierList.addAnnotation(simpleName);
     }
-    PsiAnnotation psiAnnotationDeclare = getPsiElementFactory(psiAnnotation).createAnnotationFromText(annotationText, psiModifierListOwner);
-    Map<String, PsiAnnotationMemberValue> map = getAnnotationNameToValue(psiAnnotation);
+    PsiAnnotation psiAnnotationDeclare = PsiUtils.getPsiElementFactory(psiAnnotation).createAnnotationFromText(annotationText, psiModifierListOwner);
+    Map<String, PsiAnnotationMemberValue> map = PsiUtils.getAnnotationNameToValue(psiAnnotation);
     if (map == null) {
       return;
     }
@@ -340,37 +229,6 @@ public class GeneratorUtils {
   }
 
   /**
-   * 通过名称找到对应的注释
-   *
-   * @param name                 注解名称
-   * @param psiModifierListOwner 当前写入对象
-   * @return Psi注解
-   */
-  private static PsiAnnotation findAnnotationByName(String name, PsiModifierListOwner psiModifierListOwner) {
-    PsiModifierList list = psiModifierListOwner.getModifierList();
-    if (list == null) {
-      return null;
-    }
-    PsiAnnotation[] annotations = list.getAnnotations();
-    return Arrays.stream(annotations)
-        .filter(annotation -> name.equals(PublicUtils.getSimpleNameByQualifiedName(annotation.getQualifiedName())))
-        .findFirst()
-        .orElse(null);
-  }
-
-  /**
-   * 获取指定注解的属性的名称到值的映射
-   *
-   * @param psiAnnotation Psi注解
-   * @return 注解中属性的名称到值的映射
-   */
-  private static Map<String, PsiAnnotationMemberValue> getAnnotationNameToValue(PsiAnnotation psiAnnotation) {
-    return Arrays.stream(psiAnnotation.getParameterList().getAttributes())
-        .filter(pair -> pair.getValue() != null)
-        .collect(Collectors.toMap(PsiNameValuePair::getName, PsiNameValuePair::getValue, (a, b) -> b));
-  }
-
-  /**
    * 解析多重注解
    *
    * @param memberValue Psi数组成员
@@ -385,7 +243,7 @@ public class GeneratorUtils {
           PsiNameValuePair[] psiNameValuePairs = ((PsiAnnotation) initializer).getParameterList().getAttributes();
           PsiAnnotationMemberValue value = findAnnotationMemberValueByName(psiNameValuePairs, NAME);
           if (value != null) {
-            result.put(value.getText(), getAnnotationNameToValue((PsiAnnotation) initializer));
+            result.put(value.getText(), PsiUtils.getAnnotationNameToValue((PsiAnnotation) initializer));
           }
         });
     return result;
@@ -509,10 +367,10 @@ public class GeneratorUtils {
       return;
     }
     PsiClass wantImportClass = getWantImportClass(file.getProject(), className);
-    if (wantImportClass == null || hasImportClass(importList, className.getQualifiedName())) {
+    if (wantImportClass == null || PsiUtils.hasImportClass(importList, className.getQualifiedName())) {
       return;
     }
-    importList.add(getPsiElementFactory(file).createImportStatement(wantImportClass));
+    importList.add(PsiUtils.getPsiElementFactory(file).createImportStatement(wantImportClass));
   }
 
   /**
@@ -530,26 +388,4 @@ public class GeneratorUtils {
         .orElse(null);
   }
 
-  /**
-   * 查看导入列表中是否存在指定类名的类
-   *
-   * @param importList    导入列表
-   * @param qualifiedName 导入类的全限定类名
-   * @return 若存在则返回true，不存在则返回false
-   */
-  private static boolean hasImportClass(PsiImportList importList, String qualifiedName) {
-    return Arrays.stream(importList.getAllImportStatements())
-        .map(is -> OptionalBean.ofNullable(is.getImportReference()).getBean(PsiJavaCodeReferenceElement::getQualifiedName).get())
-        .anyMatch(qualifiedName::equals);
-  }
-
-  /**
-   * 根据Psi元素获取Psi元素工厂
-   *
-   * @param psiElement Psi元素
-   * @return Psi元素工厂
-   */
-  private static PsiElementFactory getPsiElementFactory(PsiElement psiElement) {
-    return JavaPsiFacade.getElementFactory(psiElement.getProject());
-  }
 }

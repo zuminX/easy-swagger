@@ -4,7 +4,7 @@ import com.intellij.psi.PsiClass;
 import com.zuminX.annotations.swagger.ApiModel;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.names.ClassName;
-import com.zuminX.utils.GeneratorUtils;
+import com.zuminX.utils.PsiUtils;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class ApiModelGenerator implements AnnotationGenerator<PsiClass, ApiModel
    * @return ApiModel类的description属性
    */
   protected String getDescription(PsiClass psiClass) {
-    return GeneratorUtils.getFirstComment(psiClass);
+    return PsiUtils.getFirstComment(psiClass);
   }
 
   /**

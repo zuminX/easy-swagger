@@ -1,5 +1,6 @@
 package com.zuminX.config;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -34,7 +35,7 @@ public class SystemSetting implements PersistentStateComponent<SystemSetting> {
    * @return 系统设置类对象
    */
   public static SystemSetting getInstance() {
-    return ServiceManager.getService(SystemSetting.class);
+    return ApplicationManager.getApplication().getService(SystemSetting.class);
   }
 
   /**

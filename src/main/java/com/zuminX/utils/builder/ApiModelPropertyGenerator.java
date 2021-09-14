@@ -3,7 +3,7 @@ package com.zuminX.utils.builder;
 import com.intellij.psi.PsiField;
 import com.zuminX.annotations.swagger.ApiModelProperty;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
-import com.zuminX.utils.GeneratorUtils;
+import com.zuminX.utils.PsiUtils;
 
 /**
  * ApiModelProperty注解的生成器类
@@ -29,6 +29,6 @@ public class ApiModelPropertyGenerator implements AnnotationGenerator<PsiField, 
    * @return ApiModelProperty类的value属性
    */
   protected String getValue(PsiField psiField) {
-    return GeneratorUtils.getFirstComment(psiField);
+    return PsiUtils.getFirstComment(psiField);
   }
 }

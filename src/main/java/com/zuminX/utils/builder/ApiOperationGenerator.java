@@ -4,6 +4,7 @@ import com.intellij.psi.PsiMethod;
 import com.zuminX.annotations.swagger.ApiOperation;
 import com.zuminX.interceptor.AnnotationGeneratorInterceptor;
 import com.zuminX.utils.GeneratorUtils;
+import com.zuminX.utils.PsiUtils;
 
 /**
  * ApiOperation注解的生成器类
@@ -41,7 +42,7 @@ public class ApiOperationGenerator implements AnnotationGenerator<PsiMethod, Api
    * @return ApiOperation类的value属性
    */
   protected String getValue(PsiMethod psiMethod) {
-    return GeneratorUtils.getFirstComment(psiMethod);
+    return PsiUtils.getFirstComment(psiMethod);
   }
 
 }
