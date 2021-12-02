@@ -10,7 +10,7 @@
         3.The ability to set whether to generate specified annotations and default values via the Settings-Tools-Easy Swagger page.<br>
         4.The annotation information can be obtained from the Javadoc and written to the value attribute of the Swagger annotation.<br>
     ]]></description>
-  <version>1.2.3</version>
+  <version>1.2.4</version>
 
   <change-notes><![CDATA[
       <ul>
@@ -25,6 +25,7 @@
         <li> Fix the problem that the setting item cannot be persisted </li>
         <li> Fix the problem that when the annotation has a value attribute and other attributes are not assigned and the default value is an empty string, the attribute will be ignored </li>
         <li> Prompt information and settings page internationalization </li>
+        <li> Modify the obsolete API </li>
       </ul>
     ]]>
   </change-notes>
